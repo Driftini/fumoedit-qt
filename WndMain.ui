@@ -27,7 +27,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="TwMain">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="TabPostEditor">
        <attribute name="title">
@@ -113,7 +113,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="1" column="0" rowspan="2">
-         <widget class="QGroupBox" name="groupBox">
+         <widget class="QGroupBox" name="GbPicMan1">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>1</horstretch>
@@ -125,21 +125,21 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_7">
            <item row="1" column="0">
-            <widget class="QPushButton" name="pushButton">
+            <widget class="QPushButton" name="PbPictureDelete">
              <property name="text">
               <string>Delete</string>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QPushButton" name="pushButton_2">
+            <widget class="QPushButton" name="PbPictureNew">
              <property name="text">
               <string>New</string>
              </property>
             </widget>
            </item>
            <item row="0" column="0" colspan="2">
-            <widget class="QTableWidget" name="tableWidget">
+            <widget class="QTableWidget" name="TwPictures">
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>70</number>
              </attribute>
@@ -162,7 +162,7 @@
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="QGroupBox" name="groupBox_3">
+         <widget class="QGroupBox" name="GbPicMan3">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>2</horstretch>
@@ -176,36 +176,36 @@
            <item row="0" column="1" rowspan="2" colspan="2">
             <layout class="QFormLayout" name="formLayout_2">
              <item row="0" column="0">
-              <widget class="QLabel" name="label_11">
+              <widget class="QLabel" name="LblVariantFilename">
                <property name="text">
                 <string>Image filename:</string>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QLineEdit" name="lineEdit_6"/>
+              <widget class="QLineEdit" name="LeVariantFilename"/>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="label_12">
+              <widget class="QLabel" name="LblVariantLabel">
                <property name="text">
                 <string>Label:</string>
                </property>
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QLineEdit" name="lineEdit_7"/>
+              <widget class="QLineEdit" name="LeThumbLabel"/>
              </item>
             </layout>
            </item>
            <item row="2" column="2">
-            <widget class="QPushButton" name="pushButton_4">
+            <widget class="QPushButton" name="PbVariantNew">
              <property name="text">
               <string>New</string>
              </property>
             </widget>
            </item>
            <item row="0" column="0" rowspan="3">
-            <widget class="QTableWidget" name="tableWidget_2">
+            <widget class="QTableWidget" name="TwVariants">
              <attribute name="horizontalHeaderDefaultSectionSize">
               <number>71</number>
              </attribute>
@@ -225,7 +225,7 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QPushButton" name="pushButton_6">
+            <widget class="QPushButton" name="PbVariantDelete">
              <property name="text">
               <string>Delete</string>
              </property>
@@ -235,7 +235,7 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="QGroupBox" name="groupBox_2">
+         <widget class="QGroupBox" name="GbPicMan2">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>2</horstretch>
@@ -247,21 +247,21 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_8" columnstretch="0,0,0,0,0,1">
            <item row="0" column="0" alignment="Qt::AlignRight">
-            <widget class="QLabel" name="label_7">
+            <widget class="QLabel" name="LblThumbFilename">
              <property name="text">
               <string>Filename:</string>
              </property>
             </widget>
            </item>
            <item row="1" column="0" alignment="Qt::AlignRight">
-            <widget class="QLabel" name="label_8">
+            <widget class="QLabel" name="LblThumbOffsets">
              <property name="text">
               <string>Offsets:</string>
              </property>
             </widget>
            </item>
            <item row="0" column="5" rowspan="4" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-            <widget class="QGraphicsView" name="graphicsView">
+            <widget class="QGraphicsView" name="GvThumbPreview">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -285,10 +285,10 @@
            <item row="0" column="1" colspan="3">
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
-              <widget class="QLineEdit" name="lineEdit_5"/>
+              <widget class="QLineEdit" name="LeThumbFilename"/>
              </item>
              <item>
-              <widget class="QLabel" name="label_13">
+              <widget class="QLabel" name="LblThumbExt">
                <property name="maximumSize">
                 <size>
                  <width>24</width>
@@ -303,42 +303,42 @@
             </layout>
            </item>
            <item row="1" column="1">
-            <widget class="QLabel" name="label_9">
+            <widget class="QLabel" name="LblThumbX">
              <property name="text">
               <string>X:</string>
              </property>
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="QSpinBox" name="spinBox">
+            <widget class="QSpinBox" name="SbThumbX">
              <property name="suffix">
               <string>px</string>
              </property>
             </widget>
            </item>
            <item row="1" column="3">
-            <widget class="QCheckBox" name="checkBox">
+            <widget class="QCheckBox" name="CbThumbCenterX">
              <property name="text">
               <string>Center</string>
              </property>
             </widget>
            </item>
            <item row="2" column="3">
-            <widget class="QCheckBox" name="checkBox_2">
+            <widget class="QCheckBox" name="CbThumbCenterY">
              <property name="text">
               <string>Center</string>
              </property>
             </widget>
            </item>
            <item row="2" column="2">
-            <widget class="QSpinBox" name="spinBox_2">
+            <widget class="QSpinBox" name="SbThumbY">
              <property name="suffix">
               <string>px</string>
              </property>
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLabel" name="label_10">
+            <widget class="QLabel" name="LblThumbY">
              <property name="text">
               <string>Y:</string>
              </property>
@@ -359,7 +359,7 @@
      <x>0</x>
      <y>0</y>
      <width>859</width>
-     <height>30</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menumenu_I_think">
@@ -381,15 +381,24 @@
    <property name="text">
     <string>&amp;New post...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="action_Open_post">
    <property name="text">
     <string>&amp;Open post...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="action_Save">
    <property name="text">
     <string>&amp;Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionSave_As">
@@ -400,6 +409,9 @@
   <action name="actionQuit">
    <property name="text">
     <string>&amp;Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
  </widget>
@@ -412,27 +424,27 @@
   <tabstop>LePostTitle</tabstop>
   <tabstop>LePostThumbName</tabstop>
   <tabstop>PtePostBody</tabstop>
-  <tabstop>tableWidget</tabstop>
-  <tabstop>pushButton</tabstop>
-  <tabstop>pushButton_2</tabstop>
-  <tabstop>lineEdit_5</tabstop>
-  <tabstop>spinBox</tabstop>
-  <tabstop>checkBox</tabstop>
-  <tabstop>spinBox_2</tabstop>
-  <tabstop>checkBox_2</tabstop>
-  <tabstop>graphicsView</tabstop>
-  <tabstop>tableWidget_2</tabstop>
-  <tabstop>lineEdit_6</tabstop>
-  <tabstop>lineEdit_7</tabstop>
-  <tabstop>pushButton_6</tabstop>
-  <tabstop>pushButton_4</tabstop>
+  <tabstop>TwPictures</tabstop>
+  <tabstop>PbPictureDelete</tabstop>
+  <tabstop>PbPictureNew</tabstop>
+  <tabstop>LeThumbFilename</tabstop>
+  <tabstop>SbThumbX</tabstop>
+  <tabstop>CbThumbCenterX</tabstop>
+  <tabstop>SbThumbY</tabstop>
+  <tabstop>CbThumbCenterY</tabstop>
+  <tabstop>GvThumbPreview</tabstop>
+  <tabstop>TwVariants</tabstop>
+  <tabstop>LeVariantFilename</tabstop>
+  <tabstop>LeThumbLabel</tabstop>
+  <tabstop>PbVariantDelete</tabstop>
+  <tabstop>PbVariantNew</tabstop>
  </tabstops>
  <resources/>
  <connections>
   <connection>
-   <sender>checkBox</sender>
+   <sender>CbThumbCenterX</sender>
    <signal>toggled(bool)</signal>
-   <receiver>spinBox</receiver>
+   <receiver>SbThumbX</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -446,9 +458,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_2</sender>
+   <sender>CbThumbCenterY</sender>
    <signal>toggled(bool)</signal>
-   <receiver>spinBox_2</receiver>
+   <receiver>SbThumbY</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">

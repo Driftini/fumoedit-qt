@@ -35,12 +35,19 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6">
         <item row="0" column="1">
-         <widget class="QDateEdit" name="DePostDate"/>
+         <widget class="QDateEdit" name="DePostDate">
+          <property name="displayFormat">
+           <string>dd/MM/yyyy</string>
+          </property>
+         </widget>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="LblPostDate">
           <property name="text">
            <string>Date:</string>
+          </property>
+          <property name="buddy">
+           <cstring>DePostDate</cstring>
           </property>
          </widget>
         </item>
@@ -48,6 +55,9 @@
          <widget class="QLabel" name="LblPostTitle">
           <property name="text">
            <string>Title:</string>
+          </property>
+          <property name="buddy">
+           <cstring>LePostTitle</cstring>
           </property>
          </widget>
         </item>
@@ -58,6 +68,9 @@
          <widget class="QLabel" name="LblPostInternalName">
           <property name="text">
            <string>Internal name:</string>
+          </property>
+          <property name="buddy">
+           <cstring>LePostInternalName</cstring>
           </property>
          </widget>
         </item>
@@ -73,12 +86,18 @@
           <property name="text">
            <string>Thumbnail name:</string>
           </property>
+          <property name="buddy">
+           <cstring>LePostThumbName</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="2">
          <widget class="QLabel" name="LblPostID">
           <property name="text">
            <string>ID:</string>
+          </property>
+          <property name="buddy">
+           <cstring>LePostID</cstring>
           </property>
          </widget>
         </item>
@@ -89,6 +108,9 @@
          <widget class="QLabel" name="LblPostBody">
           <property name="text">
            <string>Body:</string>
+          </property>
+          <property name="buddy">
+           <cstring>PtePostBody</cstring>
           </property>
          </widget>
         </item>
@@ -180,6 +202,9 @@
                <property name="text">
                 <string>Image filename:</string>
                </property>
+               <property name="buddy">
+                <cstring>LeVariantFilename</cstring>
+               </property>
               </widget>
              </item>
              <item row="0" column="1">
@@ -189,6 +214,9 @@
               <widget class="QLabel" name="LblVariantLabel">
                <property name="text">
                 <string>Label:</string>
+               </property>
+               <property name="buddy">
+                <cstring>LeThumbLabel</cstring>
                </property>
               </widget>
              </item>
@@ -251,6 +279,9 @@
              <property name="text">
               <string>Filename:</string>
              </property>
+             <property name="buddy">
+              <cstring>LeThumbFilename</cstring>
+             </property>
             </widget>
            </item>
            <item row="1" column="0" alignment="Qt::AlignRight">
@@ -307,6 +338,9 @@
              <property name="text">
               <string>X:</string>
              </property>
+             <property name="buddy">
+              <cstring>SbThumbX</cstring>
+             </property>
             </widget>
            </item>
            <item row="1" column="2">
@@ -342,6 +376,9 @@
              <property name="text">
               <string>Y:</string>
              </property>
+             <property name="buddy">
+              <cstring>SbThumbY</cstring>
+             </property>
             </widget>
            </item>
           </layout>
@@ -359,7 +396,7 @@
      <x>0</x>
      <y>0</y>
      <width>859</width>
-     <height>21</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menumenu_I_think">

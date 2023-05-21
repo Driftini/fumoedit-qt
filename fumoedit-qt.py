@@ -1,7 +1,11 @@
 import sys
+import time
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5 import uic
 import fumoedit
+
+def currenttime():
+    return time.strftime('%H:%M:%S', time.localtime())
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -10,10 +14,37 @@ class MainWindow(QtWidgets.QMainWindow):
         uic.loadUi("WndMain.ui", self)
         self.connect_signals()
 
-        self.current_post = fumoedit.Post()
+        self.current_post = None
+        self.new_post()
 
     def connect_signals(self):
-        self.action_Save.triggered.connect(self.export_post)
+        self.ActionNewPost.triggered.connect(self.new_post)
+        self.ActionSavePost.triggered.connect(self.export_post)
+        self.LePostID.textEdited.connect(self.update_internal_name)
+        self.DePostDate.dateChanged.connect(self.update_internal_name)
+
+    def new_post(self):
+        # TODO in statusbar
+        print(f"* Created new post at {currenttime()}")
+        self.load_post(fumoedit.Post())
+
+    def load_post(self, post):
+        self.current_post = post
+
+        self.LePostID.setText(self.current_post.id)
+        self.DePostDate.setDate(self.current_post.date)
+        self.LePostTitle.setText(self.current_post.title)
+        self.LePostThumbName.setText(self.current_post.thumbnail)
+        self.PtePostBody.setPlainText(self.current_post.body)
+
+    def update_internal_name(self):
+        d_day = self.DePostDate.date().day()
+        d_month = self.DePostDate.date().month()
+        d_year = self.DePostDate.date().year()
+        self.current_post.set_date(d_year, d_month, d_day)
+        self.current_post.id = self.LePostID.text()
+
+        self.LePostInternalName.setText(self.current_post.get_internal_name())
 
     def validate_post(self):
         to_fill = []
@@ -49,6 +80,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def export_post(self):
         if self.validate_post():
+            print(f"* Exporting post at {currenttime()}:")
             self.current_post.id = self.LePostID.text()
 
             d_day = self.DePostDate.date().day()

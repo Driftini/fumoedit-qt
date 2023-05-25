@@ -132,8 +132,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def add_picture(self):
         # Add a new empty picture object to the current post
-        p = fumoedit.Picture()
-        self.current_post.pictures.append(p)
+        self.current_post.pictures.append(fumoedit.Picture())
 
         self.update_pictures_table(True)
 
@@ -142,15 +141,19 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.current_picture:
             self.current_picture.thumbnail_path = self.LeThumbFilename.text()
 
+            offset = [None, None]
+
             if self.CbThumbCenterX.isChecked():
-                self.current_picture.thumbnail_offset[0] = "center"
+                offset[0] = "center"
             else:
-                self.current_picture.thumbnail_offset[0] = self.SbThumbX.value()
+                offset[0] = self.SbThumbX.value()
 
             if self.CbThumbCenterY.isChecked():
-                self.current_picture.thumbnail_offset[1] = "center"
+                offset[1] = "center"
             else:
-                self.current_picture.thumbnail_offset[1] = self.SbThumbY.value()
+                offset[1] = self.SbThumbY.value()
+
+            self.current_picture.thumbnail_offset = offset
 
             self.update_pictures_table(False)
             print(f"* Saved picture at {currenttime()}")
@@ -171,13 +174,19 @@ class MainWindow(QtWidgets.QMainWindow):
             center_x = self.current_picture.thumbnail_offset[0] == "center"
             center_y = self.current_picture.thumbnail_offset[1] == "center"
 
-            if not center_x:
+            if center_x:
+                self.CbThumbCenterX.setChecked(True)
+                self.SbThumbX.setValue(0)
+            else:
+                self.CbThumbCenterX.setChecked(False)
                 self.SbThumbX.setValue(self.current_picture.thumbnail_offset[0])
-            if not center_y:
-                self.SbThumbY.setValue(self.current_picture.thumbnail_offset[1])
 
-            self.CbThumbCenterX.setChecked(center_x)
-            self.CbThumbCenterY.setChecked(center_y)
+            if center_y:
+                self.CbThumbCenterY.setChecked(True)
+                self.SbThumbY.setValue(0)
+            else:
+                self.CbThumbCenterY.setChecked(False)
+                self.SbThumbY.setValue(self.current_picture.thumbnail_offset[1])
 
             self.PbPictureDelete.setEnabled(True)
             self.PbVariantNew.setEnabled(True)
@@ -229,8 +238,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def add_variant(self):
         # Add a new empty variant object to the current picture
-        v = fumoedit.PictureVariant()
-        self.current_picture.variants.append(v)
+        self.current_picture.variants.append(fumoedit.PictureVariant())
     
     def save_variant(self):
         # Apply variant fields' values to the current variant object

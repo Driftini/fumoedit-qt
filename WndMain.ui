@@ -143,6 +143,9 @@
         </item>
         <item row="1" column="3">
          <widget class="QComboBox" name="CbPostCollection">
+          <property name="currentText">
+           <string>Blog</string>
+          </property>
           <item>
            <property name="text">
             <string>Blog</string>
@@ -243,24 +246,7 @@
            <string>2. Configure picture thumbnail</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_8" columnstretch="0,0,0,0,0,1">
-           <item row="0" column="0" alignment="Qt::AlignRight">
-            <widget class="QLabel" name="LblThumbFilename">
-             <property name="text">
-              <string>Filename:</string>
-             </property>
-             <property name="buddy">
-              <cstring>LeThumbFilename</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0" alignment="Qt::AlignRight">
-            <widget class="QLabel" name="LblThumbOffsets">
-             <property name="text">
-              <string>Offsets:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="5" rowspan="4" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+           <item row="0" column="5" rowspan="5" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
             <widget class="QGraphicsView" name="GvThumbPreview">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -282,27 +268,31 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1" colspan="3">
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <item>
-              <widget class="QLineEdit" name="LeThumbFilename"/>
-             </item>
-             <item>
-              <widget class="QLabel" name="LblThumbExt">
-               <property name="maximumSize">
-                <size>
-                 <width>24</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>.jpg</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+           <item row="2" column="2">
+            <widget class="QSpinBox" name="SbThumbX">
+             <property name="suffix">
+              <string>px</string>
+             </property>
+            </widget>
            </item>
-           <item row="1" column="1">
+           <item row="2" column="3">
+            <widget class="QCheckBox" name="CbThumbCenterX">
+             <property name="text">
+              <string>Center</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" alignment="Qt::AlignRight">
+            <widget class="QLabel" name="LblThumbFilename">
+             <property name="text">
+              <string>Filename:</string>
+             </property>
+             <property name="buddy">
+              <cstring>LeThumbFilename</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
             <widget class="QLabel" name="LblThumbX">
              <property name="text">
               <string>X:</string>
@@ -312,35 +302,28 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
-            <widget class="QSpinBox" name="SbThumbX">
-             <property name="suffix">
-              <string>px</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="3">
-            <widget class="QCheckBox" name="CbThumbCenterX">
-             <property name="text">
-              <string>Center</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="3">
-            <widget class="QCheckBox" name="CbThumbCenterY">
-             <property name="text">
-              <string>Center</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
+           <item row="3" column="2">
             <widget class="QSpinBox" name="SbThumbY">
              <property name="suffix">
               <string>px</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="2" column="0" alignment="Qt::AlignRight">
+            <widget class="QLabel" name="LblThumbOffsets">
+             <property name="text">
+              <string>Offsets:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="3">
+            <widget class="QCheckBox" name="CbThumbCenterY">
+             <property name="text">
+              <string>Center</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
             <widget class="QLabel" name="LblThumbY">
              <property name="text">
               <string>Y:</string>
@@ -349,6 +332,9 @@
               <cstring>SbThumbY</cstring>
              </property>
             </widget>
+           </item>
+           <item row="0" column="1" colspan="3">
+            <widget class="QLineEdit" name="LeThumbFilename"/>
            </item>
           </layout>
          </widget>
@@ -523,7 +509,6 @@
   <tabstop>TwPictures</tabstop>
   <tabstop>PbPictureDelete</tabstop>
   <tabstop>PbPictureNew</tabstop>
-  <tabstop>LeThumbFilename</tabstop>
   <tabstop>SbThumbX</tabstop>
   <tabstop>CbThumbCenterX</tabstop>
   <tabstop>SbThumbY</tabstop>

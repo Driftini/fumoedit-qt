@@ -29,15 +29,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LePostID.textEdited.connect(self.update_internal_name)
         self.DePostDate.dateChanged.connect(self.update_internal_name)
         self.CbPostCollection.currentTextChanged.connect(
-            self.update_post_collection)
+            self.update_post_collection
+        )
 
         self.TwPictures.itemSelectionChanged.connect(
-            self.picture_selection_changed)
+            self.picture_selection_changed
+        )
         self.PbPictureNew.clicked.connect(self.add_picture)
         self.PbPictureDelete.clicked.connect(self.delete_picture)
 
         self.TwVariants.itemSelectionChanged.connect(
-            self.variant_selection_changed)
+            self.variant_selection_changed
+        )
         self.PbVariantNew.clicked.connect(self.add_variant)
         self.PbVariantDelete.clicked.connect(self.delete_variant)
 
@@ -192,7 +195,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.current_picture.thumbnail_offset = offset
 
             print(
-                f"* Saved picture {self.current_post.pictures.index(self.current_picture)} at {currenttime()}")
+                f"* Saved picture {self.current_post.pictures.index(self.current_picture)} at {currenttime()}"
+            )
             self.update_pictures_table(False)
 
     def select_picture(self, picture):
@@ -291,7 +295,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.current_variant.label = self.LeVariantLabel.text()
 
             print(
-                f"* Saved variant {self.current_variant.get_label()} at {currenttime()}")
+                f"* Saved variant {self.current_variant.get_label()} at {currenttime()}"
+            )
             self.update_variants_table(False)
 
     def select_variant(self, variant):

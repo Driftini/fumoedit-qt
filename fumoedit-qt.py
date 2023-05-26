@@ -4,6 +4,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5 import uic
 import fumoedit
 
+
 def currenttime():
     return time.strftime('%H:%M:%S', time.localtime())
 
@@ -27,25 +28,44 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.LePostID.textEdited.connect(self.update_internal_name)
         self.DePostDate.dateChanged.connect(self.update_internal_name)
+        self.CbPostCollection.currentTextChanged.connect(
+            self.update_post_collection)
 
+        self.TwPictures.itemSelectionChanged.connect(
+            self.picture_selection_changed)
         self.PbPictureNew.clicked.connect(self.add_picture)
         self.PbPictureDelete.clicked.connect(self.delete_picture)
 
-        self.TwPictures.itemSelectionChanged.connect(self.picture_selection_changed)
+        self.TwVariants.itemSelectionChanged.connect(
+            self.variant_selection_changed)
+        self.PbVariantNew.clicked.connect(self.add_variant)
+        self.PbVariantDelete.clicked.connect(self.delete_variant)
 
     def picture_selection_changed(self):
         selected_rows = self.TwPictures.selectionModel().selectedRows()
-        
+
         if len(selected_rows) > 0:
-            self.select_picture(self.current_post.pictures[selected_rows[0].row()])
+            self.select_picture(
+                self.current_post.pictures[selected_rows[0].row()])
         else:
             self.deselect_picture()
+
+    def variant_selection_changed(self):
+        if self.current_picture:
+            selected_rows = self.TwVariants.selectionModel().selectedRows()
+
+            if len(selected_rows) > 0:
+                self.select_variant(
+                    self.current_picture.variants[selected_rows[0].row()])
+            else:
+                self.deselect_variant()
 
     # Post methods
     def new_post(self):
         # TODO in statusbar
         print(f"* Created new post at {currenttime()}")
         self.load_post(fumoedit.Post())
+        self.update_post_collection("Blog")
 
     def load_post(self, post):
         self.TwMain.setCurrentIndex(0)
@@ -66,6 +86,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.current_post.id = self.LePostID.text()
 
         self.LePostInternalName.setText(self.current_post.get_internal_name())
+
+    def update_post_collection(self, collection):
+        match collection:
+            case "Blog":
+                self.current_post.collection = "blog"
+            case "Artwork":
+                self.current_post.collection = "artwork"
+            case "Wallpapers":
+                self.current_post.collection = "walls"
+
+        self.TwMain.setTabEnabled(1, self.current_post.is_picturepost())
 
     def validate_post(self):
         to_fill = []
@@ -98,7 +129,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def export_post(self):
         if self.validate_post():
-            print(f"* Exporting post at {currenttime()}:")
+            print(
+                f"* Exporting post {self.current_post.get_filename()} at {currenttime()}:"
+            )
             self.current_post.id = self.LePostID.text()
 
             d_day = self.DePostDate.date().day()
@@ -113,7 +146,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.save_variant()
             self.save_picture()
 
-            print(self.current_post.get_filename())
             print(self.current_post.generate())
 
     # Picture methods
@@ -126,21 +158,25 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for i in range(0, len(self.current_post.pictures)):
             picture = self.current_post.pictures[i]
-            
-            self.TwPictures.setItem(i, 0, QtWidgets.QTableWidgetItem(f"{len(picture.variants)}"))
-            self.TwPictures.setItem(i, 1, QtWidgets.QTableWidgetItem(picture.thumbnail_path))
+
+            self.TwPictures.setItem(
+                i, 0, QtWidgets.QTableWidgetItem(f"{len(picture.variants)}"))
+            self.TwPictures.setItem(
+                i, 1, QtWidgets.QTableWidgetItem(picture.thumbnail_name))
 
     def add_picture(self):
         # Add a new empty picture object to the current post
-        self.current_post.pictures.append(fumoedit.Picture())
+        self.current_post.new_picture()
 
         self.update_pictures_table(True)
 
     def save_picture(self):
         # Apply picture fields' values to the current picture object
         if self.current_picture:
-            self.current_picture.thumbnail_path = self.LeThumbFilename.text()
+            self.current_picture.thumbnail_name = self.LeThumbFilename.text()
 
+            # Changing the offsets individually in the picture object
+            # causes them to be "shared" across every picture
             offset = [None, None]
 
             if self.CbThumbCenterX.isChecked():
@@ -155,46 +191,52 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self.current_picture.thumbnail_offset = offset
 
+            print(
+                f"* Saved picture {self.current_post.pictures.index(self.current_picture)} at {currenttime()}")
             self.update_pictures_table(False)
-            print(f"* Saved picture at {currenttime()}")
-            # TODO save variant (if any)
 
     def select_picture(self, picture):
         # Set all picture fields' values to the given picture object's,
         # update variants table accordingly
-        if len(self.current_post.pictures) > 0:
-            # If there's already a loaded picture, save its edits beforehand
-            if self.current_picture:
-                self.save_picture()
 
-            self.current_picture = picture
-        
-            self.LeThumbFilename.setText(self.current_picture.thumbnail_path)
+        # If there's already a loaded picture, save its edits beforehand
+        if self.current_picture:
+            self.deselect_variant()
+            self.save_picture()
 
-            center_x = self.current_picture.thumbnail_offset[0] == "center"
-            center_y = self.current_picture.thumbnail_offset[1] == "center"
+        self.current_picture = picture
 
-            if center_x:
-                self.CbThumbCenterX.setChecked(True)
-                self.SbThumbX.setValue(0)
-            else:
-                self.CbThumbCenterX.setChecked(False)
-                self.SbThumbX.setValue(self.current_picture.thumbnail_offset[0])
+        self.LeThumbFilename.setText(self.current_picture.thumbnail_name)
 
-            if center_y:
-                self.CbThumbCenterY.setChecked(True)
-                self.SbThumbY.setValue(0)
-            else:
-                self.CbThumbCenterY.setChecked(False)
-                self.SbThumbY.setValue(self.current_picture.thumbnail_offset[1])
+        center_x = self.current_picture.thumbnail_offset[0] == "center"
+        center_y = self.current_picture.thumbnail_offset[1] == "center"
 
-            self.PbPictureDelete.setEnabled(True)
-            self.PbVariantNew.setEnabled(True)
-            self.GbPicMan2.setEnabled(True)
+        if center_x:
+            self.CbThumbCenterX.setChecked(True)
+            self.SbThumbX.setValue(0)
+        else:
+            self.CbThumbCenterX.setChecked(False)
+            self.SbThumbX.setValue(self.current_picture.thumbnail_offset[0])
 
-        self.deselect_variant()
+        if center_y:
+            self.CbThumbCenterY.setChecked(True)
+            self.SbThumbY.setValue(0)
+        else:
+            self.CbThumbCenterY.setChecked(False)
+            self.SbThumbY.setValue(self.current_picture.thumbnail_offset[1])
+
+        self.update_variants_table(True)
+        self.TwVariants.setEnabled(True)
+        self.PbPictureDelete.setEnabled(True)
+        self.PbVariantNew.setEnabled(True)
+        self.GbPicMan2.setEnabled(True)
 
     def deselect_picture(self):
+        # If there's already a loaded picture, save its edits beforehand
+        if self.current_picture:
+            self.deselect_variant()
+            self.save_picture()
+
         # Disable all picture and variant fields
         self.current_picture = None
 
@@ -204,21 +246,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.CbThumbCenterX.setChecked(False)
         self.CbThumbCenterY.setChecked(False)
 
+        self.update_variants_table(True)
+        self.TwVariants.setEnabled(False)
         self.PbPictureDelete.setEnabled(False)
         self.PbVariantNew.setEnabled(False)
         self.GbPicMan2.setEnabled(False)
-
-        self.deselect_variant()
 
     def delete_picture(self):
         # Delete the selected picture object from the current post
         if self.current_picture:
             self.current_post.pictures.remove(self.current_picture)
-            self.current_picture = None # to prevent saving when deselecting the picture
-        
-        if len(self.current_post.pictures) > 0:
-            # TODO Select last (or first?) row in the pics table
-            pass
+            self.current_picture = None  # to prevent saving when deselecting the picture
 
         self.update_pictures_table(True)
 
@@ -226,38 +264,61 @@ class MainWindow(QtWidgets.QMainWindow):
         return True
 
     # Picture variant methods
-    def update_variants_table(self):
-        self.TwVariants.clearContents()
+    def update_variants_table(self, reset):
+        if self.current_picture:
+            if (reset):
+                self.TwVariants.clearContents()
+                self.TwVariants.setRowCount(len(self.current_picture.variants))
 
-        for i in range(0, len(self.current_picture.variants)):
-            variant = self.current_picture.variants[i]
+            for i in range(0, len(self.current_picture.variants)):
+                variant = self.current_picture.variants[i]
 
-            self.TwVariants.insertRow(i)
-            self.TwVariants.setItem(i, 0, QtWidgets.QTableWidgetItem(f"{len(variant.variants)}"))
-            self.TwVariants.setItem(i, 1, QtWidgets.QTableWidgetItem(variant.thumbnail_path))
+                self.TwVariants.setItem(
+                    i, 0, QtWidgets.QTableWidgetItem(variant.label))
+                self.TwVariants.setItem(
+                    i, 1, QtWidgets.QTableWidgetItem(variant.filename))
 
     def add_variant(self):
         # Add a new empty variant object to the current picture
-        self.current_picture.variants.append(fumoedit.PictureVariant())
-    
+        if self.current_picture:
+            self.current_picture.new_variant()
+            self.update_variants_table(True)
+
     def save_variant(self):
         # Apply variant fields' values to the current variant object
-        pass
+        if self.current_picture and self.current_variant:
+            self.current_variant.filename = self.LeVariantFilename.text()
+            self.current_variant.label = self.LeVariantLabel.text()
+
+            print(
+                f"* Saved variant {self.current_variant.get_label()} at {currenttime()}")
+            self.update_variants_table(False)
 
     def select_variant(self, variant):
         # Set all variant fields' values to the selected variant object's
-        self.PbVariantDelete.setEnabled(True)
-        self.LeVariantFilename.setEnabled(True)
-        self.LeVariantLabel.setEnabled(True)
-        
-        self.LeVariantFilename.setText(variant.path)
-        self.LeVariantLabel.setText(variant.label)
+        # If there's already a loaded variant, save its edits beforehand
+        if self.current_picture:
+            if self.current_variant:
+                self.save_variant()
 
-        self.GbPicMan3.setEnabled(True)
+            self.current_variant = variant
 
+            self.PbVariantDelete.setEnabled(True)
+            self.LeVariantFilename.setEnabled(True)
+            self.LeVariantLabel.setEnabled(True)
+
+            self.LeVariantFilename.setText(self.current_variant.filename)
+            self.LeVariantLabel.setText(self.current_variant.label)
+
+            self.GbPicMan3.setEnabled(True)
 
     def deselect_variant(self):
+        if self.current_variant:
+            self.save_variant()
+
         # Clear and disable all variant fields
+        self.current_variant = None
+
         self.PbVariantDelete.setEnabled(False)
         self.LeVariantFilename.setEnabled(False)
         self.LeVariantLabel.setEnabled(False)
@@ -265,19 +326,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LeVariantFilename.clear()
         self.LeVariantLabel.clear()
 
-
     def delete_variant(self):
         # Delete the selected variant object from the current picture
-        if self.current_variant:
-            self.current_picure.variants.remove(self.current_variant)
-        
-        if len(self.current_pictures.variants) > 0:
-            # TODO Select last (or first?) row in the variants table
-            pass
+        if self.current_picture and self.current_variant:
+            self.current_picture.variants.remove(self.current_variant)
+            self.update_variants_table(True)
 
     def validate_variant(self):
         return True
-    
+
 
 app = QtWidgets.QApplication(sys.argv)
 window = MainWindow()

@@ -24,7 +24,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="0" column="0">
+    <item row="0" column="1">
      <widget class="QTabWidget" name="TwMain">
       <property name="currentIndex">
        <number>0</number>
@@ -34,10 +34,13 @@
         <string>Post Editor</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="1">
-         <widget class="QDateEdit" name="DePostDate">
-          <property name="displayFormat">
-           <string>dd/MM/yyyy</string>
+        <item row="1" column="6">
+         <widget class="QLineEdit" name="LePostThumbName"/>
+        </item>
+        <item row="0" column="4">
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
          </widget>
         </item>
@@ -51,43 +54,70 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="LblPostTitle">
-          <property name="text">
-           <string>Title:</string>
-          </property>
-          <property name="buddy">
-           <cstring>LePostTitle</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="5">
-         <widget class="QLineEdit" name="LePostThumbName"/>
-        </item>
-        <item row="0" column="4">
-         <widget class="QLabel" name="LblPostInternalName">
-          <property name="text">
-           <string>Internal name:</string>
-          </property>
-          <property name="buddy">
-           <cstring>LePostInternalName</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="5">
+        <item row="0" column="6">
          <widget class="QLineEdit" name="LePostInternalName">
           <property name="readOnly">
            <bool>true</bool>
           </property>
          </widget>
         </item>
-        <item row="1" column="4">
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="LePostTitle"/>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Collection:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QDateEdit" name="DePostDate">
+          <property name="displayFormat">
+           <string>dd/MM/yyyy</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="7">
+         <widget class="QPlainTextEdit" name="PtePostBody">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="tabChangesFocus">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLineEdit" name="LePostID"/>
+        </item>
+        <item row="1" column="5">
          <widget class="QLabel" name="LblPostThumbName">
           <property name="text">
-           <string>Thumbnail name:</string>
+           <string>Thumbnail filename:</string>
           </property>
           <property name="buddy">
            <cstring>LePostThumbName</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="LblPostBody">
+          <property name="text">
+           <string>Body:</string>
+          </property>
+          <property name="buddy">
+           <cstring>PtePostBody</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QLabel" name="LblPostInternalName">
+          <property name="text">
+           <string>Internal name:</string>
+          </property>
+          <property name="buddy">
+           <cstring>LePostInternalName</cstring>
           </property>
          </widget>
         </item>
@@ -101,31 +131,34 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="3">
-         <widget class="QLineEdit" name="LePostID"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="LblPostBody">
+        <item row="1" column="0">
+         <widget class="QLabel" name="LblPostTitle">
           <property name="text">
-           <string>Body:</string>
+           <string>Title:</string>
           </property>
           <property name="buddy">
-           <cstring>PtePostBody</cstring>
+           <cstring>LePostTitle</cstring>
           </property>
          </widget>
         </item>
-        <item row="3" column="0" colspan="6">
-         <widget class="QPlainTextEdit" name="PtePostBody">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="tabChangesFocus">
-           <bool>true</bool>
-          </property>
+        <item row="1" column="3">
+         <widget class="QComboBox" name="CbPostCollection">
+          <item>
+           <property name="text">
+            <string>Blog</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Artwork</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Wallpapers</string>
+           </property>
+          </item>
          </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="LePostTitle"/>
         </item>
        </layout>
       </widget>
@@ -481,7 +514,6 @@
  </widget>
  <layoutdefault spacing="6" margin="6"/>
  <tabstops>
-  <tabstop>TwMain</tabstop>
   <tabstop>DePostDate</tabstop>
   <tabstop>LePostID</tabstop>
   <tabstop>LePostInternalName</tabstop>
@@ -532,38 +564,6 @@
     <hint type="destinationlabel">
      <x>396</x>
      <y>190</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>LePostID</sender>
-   <signal>textEdited(QString)</signal>
-   <receiver>LePostInternalName</receiver>
-   <slot>setText(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>538</x>
-     <y>96</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>875</x>
-     <y>96</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>DePostDate</sender>
-   <signal>dateChanged(QDate)</signal>
-   <receiver>LePostInternalName</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>260</x>
-     <y>96</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>875</x>
-     <y>96</y>
     </hint>
    </hints>
   </connection>

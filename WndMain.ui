@@ -69,6 +69,9 @@
           <property name="text">
            <string>Collection:</string>
           </property>
+          <property name="buddy">
+           <cstring>CbPostCollection</cstring>
+          </property>
          </widget>
         </item>
         <item row="0" column="1">
@@ -504,19 +507,24 @@
   <tabstop>LePostID</tabstop>
   <tabstop>LePostInternalName</tabstop>
   <tabstop>LePostTitle</tabstop>
+  <tabstop>CbPostCollection</tabstop>
   <tabstop>LePostThumbName</tabstop>
   <tabstop>PtePostBody</tabstop>
+  <tabstop>TwMain</tabstop>
   <tabstop>TwPictures</tabstop>
   <tabstop>PbPictureDelete</tabstop>
   <tabstop>PbPictureNew</tabstop>
+  <tabstop>LeThumbFilename</tabstop>
+  <tabstop>GvThumbPreview</tabstop>
   <tabstop>SbThumbX</tabstop>
   <tabstop>CbThumbCenterX</tabstop>
   <tabstop>SbThumbY</tabstop>
   <tabstop>CbThumbCenterY</tabstop>
-  <tabstop>GvThumbPreview</tabstop>
   <tabstop>TwVariants</tabstop>
   <tabstop>LeVariantFilename</tabstop>
   <tabstop>LeVariantLabel</tabstop>
+  <tabstop>PbVariantDelete</tabstop>
+  <tabstop>PbVariantNew</tabstop>
  </tabstops>
  <resources/>
  <connections>

@@ -19,11 +19,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.current_picture = None
         self.current_variant = None
         self.new_post()
-        self.deselect_picture()
 
     def connect_signals(self):
         self.ActionNewPost.triggered.connect(self.new_post)
-        self.ActionSavePost.triggered.connect(self.export_post)
+        self.ActionOpenPost.triggered.connect(self.open_post)
+        self.ActionSavePost.triggered.connect(self.save_post)
+        self.ActionSavePostAs.triggered.connect(self.export_post)
         self.ActionQuit.triggered.connect(self.close)
 
         self.LePostID.textEdited.connect(self.update_internal_name)
@@ -63,6 +64,13 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.deselect_variant()
 
+    # Open/save methods
+    def open_post(self):
+        pass
+
+    def save_post(self):
+        pass
+
     # Post methods
     def new_post(self):
         # TODO in statusbar
@@ -72,6 +80,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def load_post(self, post):
         self.TwMain.setCurrentIndex(0)
+
+        self.deselect_picture()
+        self.deselect_variant()
 
         self.current_post = post
 
@@ -93,11 +104,11 @@ class MainWindow(QtWidgets.QMainWindow):
     def update_post_collection(self, collection):
         match collection:
             case "Blog":
-                self.current_post.collection = "blog"
+                self.current_post.set_collection("blog")
             case "Artwork":
-                self.current_post.collection = "artwork"
+                self.current_post.set_collection("artwork")
             case "Wallpapers":
-                self.current_post.collection = "walls"
+                self.current_post.set_collection("walls")
 
         self.TwMain.setTabEnabled(1, self.current_post.is_picturepost())
 

@@ -1,5 +1,6 @@
 import sys
 import time
+from pathlib import Path
 from PyQt5 import QtWidgets
 from PyQt5 import uic
 import fumoedit
@@ -8,38 +9,45 @@ import fumoedit
 def currenttime():
     return time.strftime('%H:%M:%S', time.localtime())
 
+# TODO dirty file indicator
+# TODO update filepath when changing date and ID
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         uic.loadUi("WndMain.ui", self)
         self.connect_signals()
-
-        self.current_filepath = None
+        
         self.current_post = None
         self.current_picture = None
         self.current_variant = None
+        self.set_current_filepath(None)
+
         self.new_post()
 
     def connect_signals(self):
+        # Actions
         self.ActionNewPost.triggered.connect(self.new_post)
         self.ActionOpenPost.triggered.connect(self.open_post)
         self.ActionSavePost.triggered.connect(self.save_post)
-        self.ActionSavePostAs.triggered.connect(self.export_post)
+        # self.ActionSavePostAs.triggered.connect(self.export_post)
         self.ActionQuit.triggered.connect(self.close)
 
+        # Post editor widgets
         self.LePostID.textEdited.connect(self.update_internal_name)
         self.DePostDate.dateChanged.connect(self.update_internal_name)
         self.CbPostCollection.currentTextChanged.connect(
             self.update_post_collection
         )
 
+        # Picture manager widgets (pictures)
         self.TwPictures.itemSelectionChanged.connect(
             self.picture_selection_changed
         )
         self.PbPictureNew.clicked.connect(self.add_picture)
         self.PbPictureDelete.clicked.connect(self.delete_picture)
 
+        # Picture manager widgets (variants)
         self.TwVariants.itemSelectionChanged.connect(
             self.variant_selection_changed
         )
@@ -65,10 +73,17 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.deselect_variant()
 
-    # Open/save methods
+    # File-related methods
+    def set_current_filepath(self, filepath):
+        self.current_filepath = filepath
+
+        if self.current_filepath:
+            self.setWindowTitle(f"{self.current_filepath} - FumoEdit-QT")
+        else:
+            self.setWindowTitle(f"Unsaved - FumoEdit-QT")
     def open_post(self):
         dialog = QtWidgets.QFileDialog(self)
-        dialog.setFileMode(QtWidgets.QFileDialog.AnyFile)
+        dialog.setFileMode(QtWidgets.QFileDialog.ExistingFile)
         dialog.setNameFilter("Markdown files (*.md)")
 
         if dialog.exec():
@@ -79,18 +94,44 @@ class MainWindow(QtWidgets.QMainWindow):
             except Exception as e:
                 msgbox = QtWidgets.QMessageBox()
                 msgbox.setWindowTitle("Opening failed")
-                print(repr(e))
                 msgbox.setText(e.__notes__[0])
                 msgbox.setIcon(QtWidgets.QMessageBox.Critical)
                 msgbox.exec()
             else:
-                self.load_post(post)
+                self.load_post(post, filepath)
 
     def save_post(self):
-        if self.current_filepath:
-            pass
-        else:
-            pass
+        #TODO confirm if collection mismatch
+
+        if self.validate_post():
+            if not self.current_filepath:
+                dialog = QtWidgets.QFileDialog(self)
+                dialog.setFileMode(QtWidgets.QFileDialog.DirectoryOnly)
+                dialog.setNameFilter("Markdown files (*.md)")
+
+                if dialog.exec():
+                    self.set_current_filepath(dialog.selectedFiles()[0])
+                else:
+                    return
+
+            self.current_post.id = self.LePostID.text()
+
+            d_day = self.DePostDate.date().day()
+            d_month = self.DePostDate.date().month()
+            d_year = self.DePostDate.date().year()
+            self.current_post.set_date(d_year, d_month, d_day)
+
+            self.current_post.title = self.LePostTitle.text()
+            self.current_post.thumbnail = self.LePostThumbName.text()
+            self.current_post.body = self.PtePostBody.toPlainText()
+
+            self.save_variant()
+            self.save_picture()
+
+            fumoedit.post_to_file(
+                self.current_post,
+                fumoedit.get_folderpath(self.current_filepath)
+            )
 
     # Post methods
     def new_post(self):
@@ -99,13 +140,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.load_post(fumoedit.Post())
         self.update_post_collection("Blog")
 
-    def load_post(self, post):
+    def load_post(self, post, filepath=None):
         self.TwMain.setCurrentIndex(0)
 
         self.deselect_picture()
         self.deselect_variant()
 
         self.current_post = post
+        self.set_current_filepath(filepath)
 
         self.LePostID.setText(self.current_post.id)
         self.DePostDate.setDate(self.current_post.date)
@@ -168,33 +210,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 msg += f"\n• {f[:-1]}"
 
             msgbox = QtWidgets.QMessageBox()
-            msgbox.setWindowTitle("Export failed")
+            msgbox.setWindowTitle("Validation failed")
             msgbox.setText(msg)
             msgbox.setIcon(QtWidgets.QMessageBox.Critical)
             msgbox.exec()
 
             return False  # Validation failed
-
-    def export_post(self):
-        if self.validate_post():
-            print(
-                f"* Exporting post {self.current_post.get_filename()} at {currenttime()}:"
-            )
-            self.current_post.id = self.LePostID.text()
-
-            d_day = self.DePostDate.date().day()
-            d_month = self.DePostDate.date().month()
-            d_year = self.DePostDate.date().year()
-            self.current_post.set_date(d_year, d_month, d_day)
-
-            self.current_post.title = self.LePostTitle.text()
-            self.current_post.thumbnail = self.LePostThumbName.text()
-            self.current_post.body = self.PtePostBody.toPlainText()
-
-            self.save_variant()
-            self.save_picture()
-
-            print(self.current_post.generate())
 
     # Picture methods
     def update_pictures_table(self, reset):

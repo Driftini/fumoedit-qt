@@ -70,12 +70,21 @@ class MainWindow(QtWidgets.QMainWindow):
         dialog = QtWidgets.QFileDialog(self)
         dialog.setFileMode(QtWidgets.QFileDialog.AnyFile)
         dialog.setNameFilter("Markdown files (*.md)")
-        # test = dialog.getOpenFileName(self, "Open image", "/")
+
         if dialog.exec():
             filepath = dialog.selectedFiles()[0]
 
-            post = fumoedit.post_from_file(filepath)
-            self.load_post(post)
+            try:
+                post = fumoedit.post_from_file(filepath)
+            except Exception as e:
+                msgbox = QtWidgets.QMessageBox()
+                msgbox.setWindowTitle("Opening failed")
+                print(repr(e))
+                msgbox.setText(e.__notes__[0])
+                msgbox.setIcon(QtWidgets.QMessageBox.Critical)
+                msgbox.exec()
+            else:
+                self.load_post(post)
 
     def save_post(self):
         if self.current_filepath:

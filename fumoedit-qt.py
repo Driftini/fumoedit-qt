@@ -1,6 +1,6 @@
 import sys
 import time
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets
 from PyQt5 import uic
 import fumoedit
 
@@ -15,6 +15,7 @@ class MainWindow(QtWidgets.QMainWindow):
         uic.loadUi("WndMain.ui", self)
         self.connect_signals()
 
+        self.current_filepath = None
         self.current_post = None
         self.current_picture = None
         self.current_variant = None
@@ -66,10 +67,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # Open/save methods
     def open_post(self):
-        pass
+        dialog = QtWidgets.QFileDialog(self)
+        dialog.setFileMode(QtWidgets.QFileDialog.AnyFile)
+        dialog.setNameFilter("Markdown files (*.md)")
+        # test = dialog.getOpenFileName(self, "Open image", "/")
+        if dialog.exec():
+            filepath = dialog.selectedFiles()[0]
+            
+            post = fumoedit.post_from_file(filepath)
+            self.load_post(post)
 
     def save_post(self):
-        pass
+        if self.current_filepath:
+            pass
+        else:
+            pass
 
     # Post methods
     def new_post(self):
@@ -104,12 +116,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def update_post_collection(self, collection):
         match collection:
             case "Blog":
-                self.current_post.set_collection("blog")
+                self.current_post.set_collection("posts")
             case "Artwork":
                 self.current_post.set_collection("artwork")
             case "Wallpapers":
                 self.current_post.set_collection("walls")
 
+        # Enable or disable the picture manager depending on whether or not
+        # the current post is a picture post
         self.TwMain.setTabEnabled(1, self.current_post.is_picturepost())
 
     def validate_post(self):

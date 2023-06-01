@@ -73,7 +73,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # test = dialog.getOpenFileName(self, "Open image", "/")
         if dialog.exec():
             filepath = dialog.selectedFiles()[0]
-            
+
             post = fumoedit.post_from_file(filepath)
             self.load_post(post)
 
@@ -103,6 +103,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LePostTitle.setText(self.current_post.title)
         self.LePostThumbName.setText(self.current_post.thumbnail)
         self.PtePostBody.setPlainText(self.current_post.body)
+
+        self.update_pictures_table(True)
+        self.update_variants_table(True)
+
+        match self.current_post.get_collection():
+            case "posts":
+                self.CbPostCollection.setCurrentText("Blog")
+            case "artwork":
+                self.CbPostCollection.setCurrentText("Artwork")
+            case "walls":
+                self.CbPostCollection.setCurrentText("Wallpapers")
 
     def update_internal_name(self):
         d_day = self.DePostDate.date().day()

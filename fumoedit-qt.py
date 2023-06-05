@@ -3,6 +3,7 @@ import time
 from os import path
 from PyQt5 import QtGui, QtWidgets, uic
 import fumoedit
+from yaml.scanner import ScannerError
 
 
 def currenttime():
@@ -184,13 +185,33 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 try:
                     post = fumoedit.post_from_file(filepath)
-                except Exception as e:
-                    QtWidgets.QMessageBox.critical(
-                        self, "Opening failed", e.__notes__[0]
-                    )
+                except (
+                    ScannerError, KeyError,
+                    AttributeError, fumoedit.PostNameError
+                ) as e:
+                    self.open_error(filepath, e)
                 else:
                     self.load_post(post, filepath)
                     self.undirty()
+
+    def open_error(self, filepath, exception):
+        # Display an error related to post opening,
+        # with its relevant message.
+        msg = ""
+        e_type = exception.__class__
+
+        # kinda ugly
+        if e_type == ScannerError:
+            msg = f"{filepath}'s front matter's syntax is invalid."
+        elif e_type == KeyError or e_type == AttributeError:
+            msg = f"{filepath}'s metadata and/or properties are invalid."
+        elif e_type == fumoedit.PostNameError:
+            msg = f"{filepath}'s name is invalid."
+
+        # could use rich text
+        msg += f" ({e_type.__name__})\n\nDetails:\n{exception}"
+
+        QtWidgets.QMessageBox.critical(self, "Failed to open post", msg)
 
     def save_post_internal(self):
         # Set post properties to the GUI's fields' values,

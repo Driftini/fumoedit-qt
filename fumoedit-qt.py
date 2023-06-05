@@ -11,6 +11,7 @@ def currenttime():
 # TODO configuration for word wrap, font size and site root
 # TODO Confirmation when saving to a folder mismatching the post's collection
 # TODO Confirmation when saving with a internal name that mismatches the currently open file;
+# TODO fix markdown "---" cutting off pieces of content
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -367,42 +368,44 @@ class MainWindow(QtWidgets.QMainWindow):
     def update_thumbnail_preview(self):
         # Update the picture in the thumbnail preview box,
         # while applying offsets from the relevant fields
-        # TODO File existence check for the thumbnail preview
+
+        # Saving the pic outside of save method is painful
+        self.current_picture.thumbnail_name = self.LeThumbFilename.text()
+        absolute = path.abspath(self.current_picture.get_thumbnail_path())
 
         # I don't think I should instance a new scene every time
         scene = QtWidgets.QGraphicsScene()
 
-        # Saving outside of save method is painful
-        self.current_picture.thumbnail_name = self.LeThumbFilename.text()
-        absolute = path.abspath(self.current_picture.get_thumbnail_path())
+        # If the file exists...
+        if path.exists(absolute):
+            pixmap = QtGui.QPixmap(absolute)
+            scene.addPixmap(pixmap)
+            self.GvThumbPreview.setScene(scene)
 
-        # unneeded outside of debugging
-        self.LeThumbActualPath.setText(
-            self.current_picture.get_thumbnail_path())
+            self.LeThumbFilename.setStyleSheet("")
 
-        pixmap = QtGui.QPixmap(absolute)
-        scene.addPixmap(pixmap)
-        self.GvThumbPreview.setScene(scene)
+            # Prepare offsets
+            offset_x = 0
+            offset_y = 0
 
-        # Prepare offsets
-        offset_x = 0
-        offset_y = 0
+            if self.CbThumbCenterX.isChecked():
+                offset_x = pixmap.width() / 2
+                offset_x -= self.GvThumbPreview.width() / 2
+            else:
+                offset_x = self.SbThumbX.cleanText()
 
-        if self.CbThumbCenterX.isChecked():
-            offset_x = pixmap.width() / 2
-            offset_x -= self.GvThumbPreview.width() / 2
+            if self.CbThumbCenterY.isChecked():
+                offset_y = pixmap.height() / 2
+                offset_y -= self.GvThumbPreview.height() / 2
+            else:
+                offset_y = self.SbThumbY.cleanText()
+
+            # Apply offsets
+            self.GvThumbPreview.horizontalScrollBar().setValue(int(offset_x))
+            self.GvThumbPreview.verticalScrollBar().setValue(int(offset_y))
         else:
-            offset_x = self.SbThumbX.cleanText()
-
-        if self.CbThumbCenterY.isChecked():
-            offset_y = pixmap.height() / 2
-            offset_y -= self.GvThumbPreview.height() / 2
-        else:
-            offset_y = self.SbThumbY.cleanText()
-
-        # Apply offsets
-        self.GvThumbPreview.horizontalScrollBar().setValue(int(offset_x))
-        self.GvThumbPreview.verticalScrollBar().setValue(int(offset_y))
+            self.GvThumbPreview.setScene(scene)
+            self.LeThumbFilename.setStyleSheet("color: red")
 
     def add_picture(self):
         # Add a new empty picture to the current post

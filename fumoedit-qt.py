@@ -37,7 +37,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LePostID.textEdited.connect(self.update_internal_name)
         self.DePostDate.dateChanged.connect(self.update_internal_name)
         self.CbPostCollection.currentTextChanged.connect(
-            self.update_post_collection
+            self.set_post_collection
         )
 
         # Picture manager widgets (pictures)
@@ -121,6 +121,10 @@ class MainWindow(QtWidgets.QMainWindow):
             d_year = self.DePostDate.date().year()
             self.current_post.set_date(d_year, d_month, d_day)
 
+            # Set filepath again, just in case the post's internal name has been changed
+            fp = f"{fumoedit.get_folderpath(self.current_filepath)}/{self.current_post.get_filename()}"
+            self.set_current_filepath(fp)
+
             self.current_post.title = self.LePostTitle.text()
             self.current_post.thumbnail = self.LePostThumbName.text()
             self.current_post.body = self.PtePostBody.toPlainText()
@@ -138,7 +142,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # TODO in statusbar
         print(f"* Created new post at {currenttime()}")
         self.load_post(fumoedit.Post())
-        self.update_post_collection("Blog")
+        self.set_post_collection("Blog")
 
     def load_post(self, post, filepath=None):
         self.TwMain.setCurrentIndex(0)
@@ -175,7 +179,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.LePostInternalName.setText(self.current_post.get_internal_name())
 
-    def update_post_collection(self, collection):
+    def set_post_collection(self, collection):
         match collection:
             case "Blog":
                 self.current_post.set_collection("posts")

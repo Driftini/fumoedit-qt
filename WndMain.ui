@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>902</width>
+    <width>921</width>
     <height>445</height>
    </rect>
   </property>
@@ -27,23 +27,13 @@
     <item row="0" column="1">
      <widget class="QTabWidget" name="TwMain">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="TabPostEditor">
        <attribute name="title">
         <string>Post Editor</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6">
-        <item row="1" column="6">
-         <widget class="QLineEdit" name="LePostThumbName"/>
-        </item>
-        <item row="0" column="4">
-         <widget class="Line" name="line">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="LblPostDate">
           <property name="text">
@@ -54,6 +44,33 @@
           </property>
          </widget>
         </item>
+        <item row="5" column="0" colspan="7">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QPlainTextEdit" name="PtePostBody">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="tabChangesFocus">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextEdit" name="TePostBodyPreview">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
         <item row="0" column="6">
          <widget class="QLineEdit" name="LePostInternalName">
           <property name="readOnly">
@@ -61,66 +78,10 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="LePostTitle"/>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Collection:</string>
-          </property>
-          <property name="buddy">
-           <cstring>CbPostCollection</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QDateEdit" name="DePostDate">
-          <property name="displayFormat">
-           <string>dd/MM/yyyy</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="7">
-         <widget class="QPlainTextEdit" name="PtePostBody">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="tabChangesFocus">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
-         <widget class="QLineEdit" name="LePostID"/>
-        </item>
-        <item row="1" column="5">
-         <widget class="QLabel" name="LblPostThumbName">
-          <property name="text">
-           <string>Thumbnail filename:</string>
-          </property>
-          <property name="buddy">
-           <cstring>LePostThumbName</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="LblPostBody">
-          <property name="text">
-           <string>Body:</string>
-          </property>
-          <property name="buddy">
-           <cstring>PtePostBody</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="5">
-         <widget class="QLabel" name="LblPostInternalName">
-          <property name="text">
-           <string>Internal name:</string>
-          </property>
-          <property name="buddy">
-           <cstring>LePostInternalName</cstring>
+        <item row="0" column="4">
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
          </widget>
         </item>
@@ -131,16 +92,6 @@
           </property>
           <property name="buddy">
            <cstring>LePostID</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="LblPostTitle">
-          <property name="text">
-           <string>Title:</string>
-          </property>
-          <property name="buddy">
-           <cstring>LePostTitle</cstring>
           </property>
          </widget>
         </item>
@@ -164,6 +115,95 @@
             <string>Wallpapers</string>
            </property>
           </item>
+         </widget>
+        </item>
+        <item row="1" column="5">
+         <widget class="QLabel" name="LblPostThumbName">
+          <property name="text">
+           <string>Thumbnail filename:</string>
+          </property>
+          <property name="buddy">
+           <cstring>LePostThumbName</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QLabel" name="LblPostInternalName">
+          <property name="text">
+           <string>Internal name:</string>
+          </property>
+          <property name="buddy">
+           <cstring>LePostInternalName</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="LblPostBody">
+          <property name="text">
+           <string>Body:</string>
+          </property>
+          <property name="buddy">
+           <cstring>PtePostBody</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLineEdit" name="LePostID"/>
+        </item>
+        <item row="0" column="1">
+         <widget class="QDateEdit" name="DePostDate">
+          <property name="displayFormat">
+           <string>dd/MM/yyyy</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="LblPostTitle">
+          <property name="text">
+           <string>Title:</string>
+          </property>
+          <property name="buddy">
+           <cstring>LePostTitle</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="6">
+         <widget class="QLineEdit" name="LePostThumbName"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="LePostTitle"/>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Collection:</string>
+          </property>
+          <property name="buddy">
+           <cstring>CbPostCollection</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="5">
+         <widget class="QCheckBox" name="CbPostPreview">
+          <property name="text">
+           <string>Preview Markdown</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="6">
+         <widget class="QCheckBox" name="CbPostPreviewAutoscroll">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>Autoscroll to the bottom</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
        </layout>
@@ -476,7 +516,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>902</width>
+     <width>921</width>
      <height>26</height>
     </rect>
    </property>
@@ -492,7 +532,14 @@
     <addaction name="separator"/>
     <addaction name="ActionQuit"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="ActionPreferences"/>
+   </widget>
    <addaction name="MenuFile"/>
+   <addaction name="menuSettings"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="ActionNewPost">
@@ -535,6 +582,14 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
+  <action name="ActionPreferences">
+   <property name="text">
+    <string>Preferences...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+,</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="6"/>
  <tabstops>
@@ -544,7 +599,6 @@
   <tabstop>LePostTitle</tabstop>
   <tabstop>CbPostCollection</tabstop>
   <tabstop>LePostThumbName</tabstop>
-  <tabstop>PtePostBody</tabstop>
   <tabstop>TwMain</tabstop>
   <tabstop>TwPictures</tabstop>
   <tabstop>PbPictureDelete</tabstop>
@@ -592,6 +646,38 @@
     <hint type="destinationlabel">
      <x>408</x>
      <y>200</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>CbPostPreview</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>TePostBodyPreview</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>669</x>
+     <y>148</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>795</x>
+     <y>253</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>CbPostPreview</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>CbPostPreviewAutoscroll</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>649</x>
+     <y>150</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>733</x>
+     <y>150</y>
     </hint>
    </hints>
   </connection>

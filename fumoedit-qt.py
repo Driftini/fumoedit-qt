@@ -8,8 +8,14 @@ import fumoedit
 def currenttime():
     return time.strftime('%H:%M:%S', time.localtime())
 
-# TODO confirmation when saving with an internal name mismatch
-# TODO confirmation when saving to a folder mismatching collection
+# TODO configuration for font size and site root
+# TODO Picture and variant validation
+# TODO possibly rework how validation works in the first place
+# TODO Confirmation when saving to a folder mismatching the post's collection
+# TODO Confirmation when saving with a internal name that mismatches the currently open file;
+# TODO Give functionality to the statusbar
+# TODO "figure out how to use rich text"
+# TODO File existence check for the thumbnail preview
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -40,6 +46,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.CbPostCollection.currentTextChanged.connect(
             self.set_post_collection
         )
+        self.PtePostBody.textChanged.connect(self.update_post_preview)
 
         # Picture manager widgets (pictures)
         self.TwPictures.itemSelectionChanged.connect(
@@ -282,6 +289,19 @@ class MainWindow(QtWidgets.QMainWindow):
         # Enable or disable the picture manager depending on whether or not
         # the current post is a picture post
         self.TwMain.setTabEnabled(1, self.current_post.is_picturepost())
+
+    def update_post_preview(self):
+        old_scrollpos_x = self.TePostBodyPreview.horizontalScrollBar().value()
+        old_scrollpos_y = self.TePostBodyPreview.verticalScrollBar().value()
+
+        self.TePostBodyPreview.setMarkdown(self.PtePostBody.toPlainText())
+
+        if self.CbPostPreviewAutoscroll.isChecked():
+            self.TePostBodyPreview.horizontalScrollBar().setValue(old_scrollpos_x)
+            self.TePostBodyPreview.verticalScrollBar().setValue(self.TePostBodyPreview.maximumHeight())
+        else:
+            self.TePostBodyPreview.horizontalScrollBar().setValue(old_scrollpos_x)
+            self.TePostBodyPreview.verticalScrollBar().setValue(old_scrollpos_y)
 
     def validate_post(self):
         to_fill = []

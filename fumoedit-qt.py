@@ -1,8 +1,7 @@
 import sys
 import time
-from pathlib import Path
-from PyQt5 import QtWidgets
-from PyQt5 import uic
+from os import path
+from PyQt5 import QtGui, QtWidgets, uic
 import fumoedit
 
 
@@ -12,12 +11,13 @@ def currenttime():
 # TODO dirty file indicator
 # TODO update filepath when changing date and ID
 
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         uic.loadUi("WndMain.ui", self)
         self.connect_signals()
-        
+
         self.current_post = None
         self.current_picture = None
         self.current_variant = None
@@ -46,6 +46,11 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         self.PbPictureNew.clicked.connect(self.add_picture)
         self.PbPictureDelete.clicked.connect(self.delete_picture)
+        self.LeThumbFilename.textEdited.connect(self.thumbnail_props_changed)
+        self.SbThumbX.valueChanged.connect(self.thumbnail_props_changed)
+        self.SbThumbY.valueChanged.connect(self.thumbnail_props_changed)
+        self.CbThumbCenterX.toggled.connect(self.thumbnail_props_changed)
+        self.CbThumbCenterY.toggled.connect(self.thumbnail_props_changed)
 
         # Picture manager widgets (variants)
         self.TwVariants.itemSelectionChanged.connect(
@@ -73,14 +78,20 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.deselect_variant()
 
+    def thumbnail_props_changed(self):
+        if self.current_picture:
+            self.update_thumbnail_preview()
+
     # File-related methods
     def set_current_filepath(self, filepath):
         self.current_filepath = filepath
 
         if self.current_filepath:
+            absolute = path.abspath(self.current_filepath)
             self.setWindowTitle(f"{self.current_filepath} - FumoEdit-QT")
         else:
             self.setWindowTitle(f"Unsaved - FumoEdit-QT")
+
     def open_post(self):
         dialog = QtWidgets.QFileDialog(self)
         dialog.setFileMode(QtWidgets.QFileDialog.ExistingFile)
@@ -101,7 +112,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.load_post(post, filepath)
 
     def save_post(self):
-        #TODO confirm if collection mismatch
+        # TODO confirm if collection mismatch
 
         if self.validate_post():
             if not self.current_filepath:
@@ -159,6 +170,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LePostThumbName.setText(self.current_post.thumbnail)
         self.PtePostBody.setPlainText(self.current_post.body)
 
+        self.update_internal_name()
         self.update_pictures_table(True)
         self.update_variants_table(True)
 
@@ -236,6 +248,44 @@ class MainWindow(QtWidgets.QMainWindow):
                 i, 0, QtWidgets.QTableWidgetItem(f"{len(picture.variants)}"))
             self.TwPictures.setItem(
                 i, 1, QtWidgets.QTableWidgetItem(picture.thumbnail_name))
+
+    def update_thumbnail_preview(self):
+        # TODO check if file exists
+
+        # I don't think I should instance a new scene every time
+        scene = QtWidgets.QGraphicsScene()
+
+        # Saving outside of save method is painful
+        self.current_picture.thumbnail_name = self.LeThumbFilename.text()
+        absolute = path.abspath(self.current_picture.get_thumbnail_path())
+
+        # unneeded outside of debugging
+        self.LeThumbActualPath.setText(
+            self.current_picture.get_thumbnail_path())
+
+        pixmap = QtGui.QPixmap(absolute)
+        scene.addPixmap(pixmap)
+        self.GvThumbPreview.setScene(scene)
+
+        # Prepare offsets
+        offset_x = 0
+        offset_y = 0
+
+        if self.CbThumbCenterX.isChecked():
+            offset_x = pixmap.width() / 2
+            offset_x -= self.GvThumbPreview.width() / 2
+        else:
+            offset_x = self.SbThumbX.cleanText()
+
+        if self.CbThumbCenterY.isChecked():
+            offset_y = pixmap.height() / 2
+            offset_y -= self.GvThumbPreview.height() / 2
+        else:
+            offset_y = self.SbThumbY.cleanText()
+
+        # Apply offsets
+        self.GvThumbPreview.horizontalScrollBar().setValue(int(offset_x))
+        self.GvThumbPreview.verticalScrollBar().setValue(int(offset_y))
 
     def add_picture(self):
         # Add a new empty picture object to the current post
@@ -335,6 +385,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.update_pictures_table(True)
 
     def validate_picture(self):
+        # TODO
         return True
 
     # Picture variant methods
@@ -408,6 +459,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.update_variants_table(True)
 
     def validate_variant(self):
+        # TODO
         return True
 
 

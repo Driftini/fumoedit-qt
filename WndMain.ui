@@ -248,9 +248,12 @@
           <property name="title">
            <string>2. Configure picture thumbnail</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_8" columnstretch="0,0,0,0,0,1">
+          <layout class="QGridLayout" name="gridLayout_8" columnstretch="0,0,1,1,0,2">
            <item row="0" column="5" rowspan="5" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
             <widget class="QGraphicsView" name="GvThumbPreview">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -269,12 +272,27 @@
                <height>128</height>
               </size>
              </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+             </property>
+             <property name="transformationAnchor">
+              <enum>QGraphicsView::NoAnchor</enum>
+             </property>
             </widget>
            </item>
            <item row="2" column="2">
             <widget class="QSpinBox" name="SbThumbX">
              <property name="suffix">
               <string>px</string>
+             </property>
+             <property name="maximum">
+              <number>512</number>
              </property>
             </widget>
            </item>
@@ -310,6 +328,9 @@
              <property name="suffix">
               <string>px</string>
              </property>
+             <property name="maximum">
+              <number>512</number>
+             </property>
             </widget>
            </item>
            <item row="2" column="0" alignment="Qt::AlignRight">
@@ -339,6 +360,20 @@
            <item row="0" column="1" colspan="3">
             <widget class="QLineEdit" name="LeThumbFilename"/>
            </item>
+           <item row="1" column="0" alignment="Qt::AlignRight">
+            <widget class="QLabel" name="LblThumbActualPath">
+             <property name="text">
+              <string>Actual path:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1" colspan="3">
+            <widget class="QLineEdit" name="LeThumbActualPath">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
@@ -353,7 +388,7 @@
           <property name="title">
            <string>3. Add picture variants</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout" columnstretch="2,0,0">
+          <layout class="QGridLayout" name="gridLayout" columnstretch="2,1,1">
            <item row="0" column="1" rowspan="2" colspan="2">
             <layout class="QFormLayout" name="formLayout_2">
              <item row="0" column="0">
@@ -395,9 +430,6 @@
              <property name="selectionBehavior">
               <enum>QAbstractItemView::SelectRows</enum>
              </property>
-             <attribute name="horizontalHeaderDefaultSectionSize">
-              <number>71</number>
-             </attribute>
              <attribute name="horizontalHeaderStretchLastSection">
               <bool>true</bool>
              </attribute>
@@ -535,12 +567,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>432</x>
-     <y>147</y>
+     <x>468</x>
+     <y>174</y>
     </hint>
     <hint type="destinationlabel">
-     <x>370</x>
-     <y>146</y>
+     <x>396</x>
+     <y>176</y>
     </hint>
    </hints>
   </connection>
@@ -551,12 +583,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>468</x>
-     <y>188</y>
+     <x>487</x>
+     <y>198</y>
     </hint>
     <hint type="destinationlabel">
-     <x>396</x>
-     <y>190</y>
+     <x>408</x>
+     <y>200</y>
     </hint>
    </hints>
   </connection>

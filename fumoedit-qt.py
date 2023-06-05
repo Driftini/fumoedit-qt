@@ -8,14 +8,9 @@ import fumoedit
 def currenttime():
     return time.strftime('%H:%M:%S', time.localtime())
 
-# TODO configuration for font size and site root
-# TODO Picture and variant validation
-# TODO possibly rework how validation works in the first place
+# TODO configuration for word wrap, font size and site root
 # TODO Confirmation when saving to a folder mismatching the post's collection
 # TODO Confirmation when saving with a internal name that mismatches the currently open file;
-# TODO Give functionality to the statusbar
-# TODO "figure out how to use rich text"
-# TODO File existence check for the thumbnail preview
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -67,7 +62,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.PbVariantNew.clicked.connect(self.add_variant)
         self.PbVariantDelete.clicked.connect(self.delete_variant)
 
-        # Dirty signaling
+        # Dirty signaling (abhorrent)
         self.LePostID.textEdited.connect(self.dirty)
         self.DePostDate.dateChanged.connect(self.dirty)
         self.CbPostCollection.currentTextChanged.connect(self.dirty)
@@ -115,14 +110,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # Miscellaneous methods
     def dirty(self):
-        # Just tag file as dirty
+        # Tag current post as dirty, update window title to reflect so
         if not self.dirty_file:
             self.setWindowTitle(f"*{self.windowTitle()}")
 
         self.dirty_file = True
 
     def undirty(self):
+        # Remove dirty tag from the current post,
+        # update window title to reflect so
         if self.dirty_file and self.windowTitle()[0] == "*":
+            # ^probably useless redundancy
             self.setWindowTitle(self.windowTitle()[1:])
 
         self.dirty_file = False
@@ -153,6 +151,8 @@ class MainWindow(QtWidgets.QMainWindow):
         return True
 
     def closeEvent(self, event):
+        # Override for the window's close event, prompts the user
+        # for confirmation if there are unsaved changes
         if self.discard_confirmation():
             event.accept()
         else:
@@ -160,6 +160,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # File-related methods
     def set_current_filepath(self, filepath):
+        # Update the current post's filepath and
+        # the window title to reflect it
         self.current_filepath = filepath
 
         if self.current_filepath:
@@ -169,6 +171,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.setWindowTitle(f"Unsaved - FumoEdit-QT")
 
     def open_post(self):
+        # Load a post from a file chosen
+        # via an open file dialog
         if self.discard_confirmation():
             dialog = QtWidgets.QFileDialog(self)
             dialog.setFileMode(QtWidgets.QFileDialog.ExistingFile)
@@ -188,7 +192,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.undirty()
 
     def save_post_internal(self):
-        # not to be called directly
+        # Set post properties to the GUI's fields' values,
+        # NOT to be called directly
         self.current_post.id = self.LePostID.text()
 
         d_day = self.DePostDate.date().day()
@@ -215,7 +220,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.undirty()
 
     def save_post(self):
-        # TODO confirm if collection mismatch
+        # Immediately save the current post if it already
+        # has a filepath, otherwise let the user choose a
+        # save directory.
         if self.validate_post():
             if not self.current_filepath:
                 self.save_post_as()
@@ -223,6 +230,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.save_post_internal()
 
     def save_post_as(self):
+        # Present a dialog to choose the save directory,
+        # then save the current post
         if self.validate_post():
             dialog = QtWidgets.QFileDialog(self)
             dialog.setFileMode(QtWidgets.QFileDialog.DirectoryOnly)
@@ -234,14 +243,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # Post methods
     def new_post(self):
+        # Load a blank post in the Blog collection
         if self.discard_confirmation():
             self.load_post(fumoedit.Post())
             self.set_post_collection("Blog")
             self.undirty()
-            # TODO in statusbar
             print(f"* Created new post at {currenttime()}")
 
     def load_post(self, post, filepath=None):
+        # Brings focus to the Post Editor and fills in every field
+        # of the GUI with the given post's properties
         self.TwMain.setCurrentIndex(0)
 
         self.deselect_picture()
@@ -278,6 +289,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LePostInternalName.setText(self.current_post.get_internal_name())
 
     def set_post_collection(self, collection):
+        # Set the current post's collection
+        # using the latters' "pretty names"
         match collection:
             case "Blog":
                 self.current_post.set_collection("posts")
@@ -291,6 +304,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.TwMain.setTabEnabled(1, self.current_post.is_picturepost())
 
     def update_post_preview(self):
+        # Update the Markdown preview of the post body, while retaining
+        # the old scrollbar position unless autoscroll has been enabled.
         old_scrollpos_x = self.TePostBodyPreview.horizontalScrollBar().value()
         old_scrollpos_y = self.TePostBodyPreview.verticalScrollBar().value()
 
@@ -298,12 +313,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.CbPostPreviewAutoscroll.isChecked():
             self.TePostBodyPreview.horizontalScrollBar().setValue(old_scrollpos_x)
-            self.TePostBodyPreview.verticalScrollBar().setValue(self.TePostBodyPreview.maximumHeight())
+            self.TePostBodyPreview.verticalScrollBar().setValue(
+                self.TePostBodyPreview.maximumHeight()
+            )
         else:
             self.TePostBodyPreview.horizontalScrollBar().setValue(old_scrollpos_x)
             self.TePostBodyPreview.verticalScrollBar().setValue(old_scrollpos_y)
 
     def validate_post(self):
+        # Post validation conditions:
+        # Has title, has ID, has body
         to_fill = []
 
         if len(self.LePostTitle.text()) <= 0:
@@ -320,7 +339,6 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             msg = "The following fields haven't been filled out:"
 
-            # TODO figure out how to use rich text
             for f in to_fill:
                 msg += f"\n• {f[:-1]}"
 
@@ -347,7 +365,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 i, 1, QtWidgets.QTableWidgetItem(picture.thumbnail_name))
 
     def update_thumbnail_preview(self):
-        # TODO check if file exists
+        # Update the picture in the thumbnail preview box,
+        # while applying offsets from the relevant fields
+        # TODO File existence check for the thumbnail preview
 
         # I don't think I should instance a new scene every time
         scene = QtWidgets.QGraphicsScene()
@@ -385,18 +405,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.GvThumbPreview.verticalScrollBar().setValue(int(offset_y))
 
     def add_picture(self):
-        # Add a new empty picture object to the current post
+        # Add a new empty picture to the current post
         self.current_post.new_picture()
 
         self.update_pictures_table(True)
 
     def save_picture(self):
-        # Apply picture fields' values to the current picture object
+        # Apply picture fields' values to the current picture
         if self.current_picture:
             self.current_picture.thumbnail_name = self.LeThumbFilename.text()
 
-            # Changing the offsets individually in the picture object
-            # causes them to be "shared" across every picture
             offset = [None, None]
 
             if self.CbThumbCenterX.isChecked():
@@ -417,9 +435,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.update_pictures_table(False)
 
     def select_picture(self, picture):
-        # Set all picture fields' values to the given picture object's,
+        # Set all picture fields' values to the given picture's,
         # update variants table accordingly
-
         # If there's already a loaded picture, save its edits beforehand
         if self.current_picture:
             self.deselect_variant()
@@ -474,7 +491,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.GbPicMan2.setEnabled(False)
 
     def delete_picture(self):
-        # Delete the selected picture object from the current post
+        # Delete the selected picture from the current post
         if self.current_picture:
             self.current_post.pictures.remove(self.current_picture)
             self.current_picture = None  # to prevent saving when deselecting the picture
@@ -487,6 +504,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # Picture variant methods
     def update_variants_table(self, reset):
+        # If reset is on, the contents will be cleared and reinserted
+        # Else, only the visible values will change
         if self.current_picture:
             if (reset):
                 self.TwVariants.clearContents()
@@ -501,13 +520,13 @@ class MainWindow(QtWidgets.QMainWindow):
                     i, 1, QtWidgets.QTableWidgetItem(variant.filename))
 
     def add_variant(self):
-        # Add a new empty variant object to the current picture
+        # Add a new empty variant to the current picture
         if self.current_picture:
             self.current_picture.new_variant()
             self.update_variants_table(True)
 
     def save_variant(self):
-        # Apply variant fields' values to the current variant object
+        # Apply variant fields' values to the current variant
         if self.current_picture and self.current_variant:
             self.current_variant.filename = self.LeVariantFilename.text()
             self.current_variant.label = self.LeVariantLabel.text()
@@ -518,7 +537,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.update_variants_table(False)
 
     def select_variant(self, variant):
-        # Set all variant fields' values to the selected variant object's
+        # Set all variant fields' values to the selected variant's
         # If there's already a loaded variant, save its edits beforehand
         if self.current_picture:
             if self.current_variant:
@@ -536,6 +555,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.GbPicMan3.setEnabled(True)
 
     def deselect_variant(self):
+        # If there's already a loaded variant, save its edits beforehand
         if self.current_variant:
             self.save_variant()
 
@@ -550,7 +570,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LeVariantLabel.clear()
 
     def delete_variant(self):
-        # Delete the selected variant object from the current picture
+        # Delete the selected variant from the current picture
         if self.current_picture and self.current_variant:
             self.current_picture.variants.remove(self.current_variant)
             self.update_variants_table(True)

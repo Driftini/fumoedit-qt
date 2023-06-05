@@ -8,8 +8,8 @@ import fumoedit
 def currenttime():
     return time.strftime('%H:%M:%S', time.localtime())
 
-# TODO dirty file indicator
-# TODO update filepath when changing date and ID
+# TODO confirmation when saving with an internal name mismatch
+# TODO confirmation when saving to a folder mismatching collection
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -22,6 +22,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.current_picture = None
         self.current_variant = None
         self.set_current_filepath(None)
+        self.dirty_file = False
 
         self.new_post()
 
@@ -59,6 +60,29 @@ class MainWindow(QtWidgets.QMainWindow):
         self.PbVariantNew.clicked.connect(self.add_variant)
         self.PbVariantDelete.clicked.connect(self.delete_variant)
 
+        # Dirty signaling
+        self.LePostID.textEdited.connect(self.dirty)
+        self.DePostDate.dateChanged.connect(self.dirty)
+        self.CbPostCollection.currentTextChanged.connect(self.dirty)
+        self.LePostTitle.textEdited.connect(self.dirty)
+        self.LePostThumbName.textEdited.connect(self.dirty)
+        self.PtePostBody.textChanged.connect(self.dirty)
+
+        self.TwPictures.itemSelectionChanged.connect(self.dirty)
+        self.PbPictureNew.clicked.connect(self.dirty)
+        self.PbPictureDelete.clicked.connect(self.dirty)
+        self.LeThumbFilename.textEdited.connect(self.dirty)
+        self.SbThumbX.valueChanged.connect(self.dirty)
+        self.SbThumbY.valueChanged.connect(self.dirty)
+        self.CbThumbCenterX.toggled.connect(self.dirty)
+        self.CbThumbCenterY.toggled.connect(self.dirty)
+
+        self.TwVariants.itemSelectionChanged.connect(self.dirty)
+        self.PbVariantNew.clicked.connect(self.dirty)
+        self.PbVariantDelete.clicked.connect(self.dirty)
+        self.LeVariantFilename.textEdited.connect(self.dirty)
+        self.LeVariantLabel.textEdited.connect(self.dirty)
+
     def picture_selection_changed(self):
         selected_rows = self.TwPictures.selectionModel().selectedRows()
 
@@ -82,78 +106,133 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.current_picture:
             self.update_thumbnail_preview()
 
+    # Miscellaneous methods
+    def dirty(self):
+        # Just tag file as dirty
+        if not self.dirty_file:
+            self.setWindowTitle(f"*{self.windowTitle()}")
+
+        self.dirty_file = True
+
+    def undirty(self):
+        if self.dirty_file and self.windowTitle()[0] == "*":
+            self.setWindowTitle(self.windowTitle()[1:])
+
+        self.dirty_file = False
+
+    def discard_confirmation(self):
+        # If the current file is dirty, ask for
+        # confirmation before possibly discarding changes
+        if self.dirty_file:
+            msgbox = QtWidgets.QMessageBox()
+            msgbox.setWindowTitle("Discard changes?")
+            msgbox.setText(
+                "There might be unsaved changes in the current post.\nDo you want to discard them?"
+            )
+            msgbox.setIcon(QtWidgets.QMessageBox.Warning)
+            msgbox.addButton(QtWidgets.QMessageBox.StandardButton.Discard)
+            msgbox.addButton(QtWidgets.QMessageBox.StandardButton.Cancel)
+
+            reply = msgbox.question(self, "Discard changes?",
+                                    "There might be unsaved changes in the current post.\nDo you want to discard them?",
+                                    QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel,
+                                    QtWidgets.QMessageBox.Cancel
+                                    )
+
+            if reply == QtWidgets.QMessageBox.StandardButton.Discard:
+                return True
+            else:
+                return False
+        return True
+
+    def closeEvent(self, event):
+        if self.discard_confirmation():
+            event.accept()
+        else:
+            event.ignore()
+
     # File-related methods
     def set_current_filepath(self, filepath):
         self.current_filepath = filepath
 
         if self.current_filepath:
             absolute = path.abspath(self.current_filepath)
-            self.setWindowTitle(f"{self.current_filepath} - FumoEdit-QT")
+            self.setWindowTitle(f"{absolute} - FumoEdit-QT")
         else:
             self.setWindowTitle(f"Unsaved - FumoEdit-QT")
 
     def open_post(self):
-        dialog = QtWidgets.QFileDialog(self)
-        dialog.setFileMode(QtWidgets.QFileDialog.ExistingFile)
-        dialog.setNameFilter("Markdown files (*.md)")
+        if self.discard_confirmation():
+            dialog = QtWidgets.QFileDialog(self)
+            dialog.setFileMode(QtWidgets.QFileDialog.ExistingFile)
+            dialog.setNameFilter("Markdown files (*.md)")
 
-        if dialog.exec():
-            filepath = dialog.selectedFiles()[0]
+            if dialog.exec():
+                filepath = dialog.selectedFiles()[0]
 
-            try:
-                post = fumoedit.post_from_file(filepath)
-            except Exception as e:
-                msgbox = QtWidgets.QMessageBox()
-                msgbox.setWindowTitle("Opening failed")
-                msgbox.setText(e.__notes__[0])
-                msgbox.setIcon(QtWidgets.QMessageBox.Critical)
-                msgbox.exec()
-            else:
-                self.load_post(post, filepath)
+                try:
+                    post = fumoedit.post_from_file(filepath)
+                except Exception as e:
+                    QtWidgets.QMessageBox.critical(
+                        self, "Opening failed", e.__notes__[0]
+                    )
+                else:
+                    self.load_post(post, filepath)
+                    self.undirty()
+
+    def save_post_internal(self):
+        # not to be called directly
+        self.current_post.id = self.LePostID.text()
+
+        d_day = self.DePostDate.date().day()
+        d_month = self.DePostDate.date().month()
+        d_year = self.DePostDate.date().year()
+        self.current_post.set_date(d_year, d_month, d_day)
+
+        # Set filepath again, just in case the post's internal name has been changed
+        fp = f"{fumoedit.get_folderpath(self.current_filepath)}/{self.current_post.get_filename()}"
+        self.set_current_filepath(fp)
+
+        self.current_post.title = self.LePostTitle.text()
+        self.current_post.thumbnail = self.LePostThumbName.text()
+        self.current_post.body = self.PtePostBody.toPlainText()
+
+        self.save_variant()
+        self.save_picture()
+
+        fumoedit.post_to_file(
+            self.current_post,
+            fumoedit.get_folderpath(self.current_filepath)
+        )
+
+        self.undirty()
 
     def save_post(self):
         # TODO confirm if collection mismatch
-
         if self.validate_post():
             if not self.current_filepath:
-                dialog = QtWidgets.QFileDialog(self)
-                dialog.setFileMode(QtWidgets.QFileDialog.DirectoryOnly)
-                dialog.setNameFilter("Markdown files (*.md)")
+                self.save_post_as()
+            else:
+                self.save_post_internal()
 
-                if dialog.exec():
-                    self.set_current_filepath(dialog.selectedFiles()[0])
-                else:
-                    return
+    def save_post_as(self):
+        if self.validate_post():
+            dialog = QtWidgets.QFileDialog(self)
+            dialog.setFileMode(QtWidgets.QFileDialog.DirectoryOnly)
+            dialog.setNameFilter("Markdown files (*.md)")
 
-            self.current_post.id = self.LePostID.text()
-
-            d_day = self.DePostDate.date().day()
-            d_month = self.DePostDate.date().month()
-            d_year = self.DePostDate.date().year()
-            self.current_post.set_date(d_year, d_month, d_day)
-
-            # Set filepath again, just in case the post's internal name has been changed
-            fp = f"{fumoedit.get_folderpath(self.current_filepath)}/{self.current_post.get_filename()}"
-            self.set_current_filepath(fp)
-
-            self.current_post.title = self.LePostTitle.text()
-            self.current_post.thumbnail = self.LePostThumbName.text()
-            self.current_post.body = self.PtePostBody.toPlainText()
-
-            self.save_variant()
-            self.save_picture()
-
-            fumoedit.post_to_file(
-                self.current_post,
-                fumoedit.get_folderpath(self.current_filepath)
-            )
+            if dialog.exec():
+                self.set_current_filepath(dialog.selectedFiles()[0])
+                self.save_post_internal()
 
     # Post methods
     def new_post(self):
-        # TODO in statusbar
-        print(f"* Created new post at {currenttime()}")
-        self.load_post(fumoedit.Post())
-        self.set_post_collection("Blog")
+        if self.discard_confirmation():
+            self.load_post(fumoedit.Post())
+            self.set_post_collection("Blog")
+            self.undirty()
+            # TODO in statusbar
+            print(f"* Created new post at {currenttime()}")
 
     def load_post(self, post, filepath=None):
         self.TwMain.setCurrentIndex(0)
@@ -225,11 +304,9 @@ class MainWindow(QtWidgets.QMainWindow):
             for f in to_fill:
                 msg += f"\n• {f[:-1]}"
 
-            msgbox = QtWidgets.QMessageBox()
-            msgbox.setWindowTitle("Validation failed")
-            msgbox.setText(msg)
-            msgbox.setIcon(QtWidgets.QMessageBox.Critical)
-            msgbox.exec()
+            QtWidgets.QMessageBox.critical(
+                self, "Validation failed", msg
+            )
 
             return False  # Validation failed
 

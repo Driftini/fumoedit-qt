@@ -10,8 +10,7 @@ def currenttime():
 
 # TODO configuration for word wrap, font size and site root
 # TODO Confirmation when saving to a folder mismatching the post's collection
-# TODO Confirmation when saving with a internal name that mismatches the currently open file;
-# TODO fix markdown "---" cutting off pieces of content
+# TODO Confirmation when saving with a internal name that mismatches the currently open file
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -139,11 +138,12 @@ class MainWindow(QtWidgets.QMainWindow):
             msgbox.addButton(QtWidgets.QMessageBox.StandardButton.Discard)
             msgbox.addButton(QtWidgets.QMessageBox.StandardButton.Cancel)
 
-            reply = msgbox.question(self, "Discard changes?",
-                                    "There might be unsaved changes in the current post.\nDo you want to discard them?",
-                                    QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel,
-                                    QtWidgets.QMessageBox.Cancel
-                                    )
+            reply = msgbox.question(
+                self, "Discard changes?",
+                "There might be unsaved changes in the current post.\nDo you want to discard them?",
+                QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel,
+                QtWidgets.QMessageBox.Cancel
+            )
 
             if reply == QtWidgets.QMessageBox.StandardButton.Discard:
                 return True
@@ -202,7 +202,8 @@ class MainWindow(QtWidgets.QMainWindow):
         d_year = self.DePostDate.date().year()
         self.current_post.set_date(d_year, d_month, d_day)
 
-        # Set filepath again, just in case the post's internal name has been changed
+        # Set filepath again, just in case
+        # the post's internal name has been changed
         fp = f"{fumoedit.get_folderpath(self.current_filepath)}/{self.current_post.get_filename()}"
         self.set_current_filepath(fp)
 

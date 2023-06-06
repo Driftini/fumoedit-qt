@@ -29,6 +29,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.set_current_filepath(None)
         self.dirty_file = False
 
+        self.LePostThumbName.path_part_1 = lambda: settings["site_path"]
+        self.LePostThumbName.path_part_2 = lambda: self.current_post.get_thumbnail_path()[1:]
+
+        self.LeThumbFilename.path_part_1 = lambda: settings["site_path"]
+        self.LeThumbFilename.path_part_2 = lambda: self.current_picture.get_thumbnail_path()[1:]
+
+        self.LeVariantFilename.path_part_1 = lambda: settings["site_path"]
+        self.LeVariantFilename.path_part_2 = lambda: self.current_variant.get_path()[1:]
+
         self.new_post()
 
     def connect_signals(self):
@@ -46,7 +55,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.CbPostCollection.currentTextChanged.connect(
             self.set_post_collection
         )
-        self.LePostThumbName.textChanged.connect(self.check_post_thumbnail)
+        # textEdited is sent before textChanged, which
+        # is what FilenameEdit uses for checks
+        self.LePostThumbName.textEdited.connect(self.post_thumbnail_changed)
         self.PtePostBody.textChanged.connect(self.update_post_preview)
 
         # Picture manager widgets (pictures)
@@ -65,7 +76,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.TwVariants.itemSelectionChanged.connect(
             self.variant_selection_changed
         )
-        self.LeVariantFilename.textChanged.connect(self.check_variant_filename)
+        self.LeVariantFilename.textEdited.connect(
+            self.variant_filename_changed
+        )
         self.PbVariantNew.clicked.connect(self.add_variant)
         self.PbVariantDelete.clicked.connect(self.delete_variant)
 
@@ -92,6 +105,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LeVariantFilename.textEdited.connect(self.dirty)
         self.LeVariantLabel.textEdited.connect(self.dirty)
 
+    def post_thumbnail_changed(self):
+        self.current_post.thumbnail = self.LePostThumbName.text()
+
     def picture_selection_changed(self):
         selected_rows = self.TwPictures.selectionModel().selectedRows()
 
@@ -100,6 +116,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.current_post.pictures[selected_rows[0].row()])
         else:
             self.deselect_picture()
+
+    def thumbnail_props_changed(self):
+        if self.current_picture:
+            self.update_thumbnail_preview()
 
     def variant_selection_changed(self):
         if self.current_picture:
@@ -111,9 +131,9 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.deselect_variant()
 
-    def thumbnail_props_changed(self):
-        if self.current_picture:
-            self.update_thumbnail_preview()
+    def variant_filename_changed(self):
+        if self.current_picture and self.current_variant:
+            self.current_variant.filename = self.LeVariantFilename.text()
 
     # Miscellaneous methods
     def dirty(self):
@@ -362,21 +382,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # the current post is a picture post
         self.TwMain.setTabEnabled(1, self.current_post.is_picturepost())
 
-    def check_post_thumbnail(self):
-        self.current_post.thumbnail = self.LePostThumbName.text()
-
-        actual_path = path.join(
-            settings["site_path"],
-            self.current_post.get_thumbnail_path()[1:] # remove 1st slash
-        )
-
-        if path.exists(actual_path):
-            self.LePostThumbName.setStyleSheet("")
-        else:
-            self.LePostThumbName.setStyleSheet("color: red")
-
-        self.LePostThumbName.setToolTip(path.abspath(actual_path))
-
     def update_post_preview(self):
         # Update the Markdown preview of the post body, while retaining
         # the old scrollbar position unless autoscroll has been enabled.
@@ -460,8 +465,6 @@ class MainWindow(QtWidgets.QMainWindow):
             scene.addPixmap(pixmap)
             self.GvThumbPreview.setScene(scene)
 
-            self.LeThumbFilename.setStyleSheet("")
-
             # Prepare offsets
             offset_x = 0
             offset_y = 0
@@ -483,9 +486,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.GvThumbPreview.verticalScrollBar().setValue(int(offset_y))
         else:
             self.GvThumbPreview.setScene(scene)
-            self.LeThumbFilename.setStyleSheet("color: red")
-        
-        self.LeThumbFilename.setToolTip(absolute)
 
     def add_picture(self):
         # Add a new empty picture to the current post
@@ -658,22 +658,6 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.current_picture and self.current_variant:
             self.current_picture.variants.remove(self.current_variant)
             self.update_variants_table(True)
-
-    def check_variant_filename(self):
-        if self.current_picture and self.current_variant:
-            self.current_variant.filename = self.LeVariantFilename.text()
-
-            actual_path = path.join(
-                settings["site_path"],
-                self.current_variant.get_path()[1:]
-            )
-
-            if path.exists(actual_path):
-                self.LeVariantFilename.setStyleSheet("")
-            else:
-                self.LeVariantFilename.setStyleSheet("color: red")
-
-            self.LeVariantFilename.setToolTip(path.abspath(actual_path))
 
     def validate_variant(self):
         # TODO

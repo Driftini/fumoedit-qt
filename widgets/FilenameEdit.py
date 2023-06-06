@@ -10,22 +10,20 @@ class FilenameEdit(QtWidgets.QLineEdit):
 
         self.textChanged.connect(self.check_path)
 
-    def path_component_1(self):
+    def path_part_1(self):
         # To override
         return " "
 
-    def path_component_2(self):
+    def path_part_2(self):
         # To override
         return " "
 
     def check_path(self):
         # Make text red if the current path doesn't exist,
         # update the tooltip to contain the absolute path
-        print(self.path_component_1())
-        print(self.path_component_2())
 
         actual_path = path.join(
-            self.path_component_1(), self.path_component_2()
+            self.path_part_1(), self.path_part_2()
         )
         absolute = path.abspath(actual_path)
 
@@ -41,4 +39,4 @@ class FilenameEdit(QtWidgets.QLineEdit):
         if not bool:
             self.setToolTip("")
 
-        super.setEnabled(bool)
+        super().setEnabled(bool)

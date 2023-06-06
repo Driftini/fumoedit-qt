@@ -11,6 +11,8 @@ class SettingsWindow(QtWidgets.QDialog):
         uic.loadUi("forms/WndSettings.ui", self)
         self.connect_signals()
 
+        self.LeSitePath.path_part_1 = self.LeSitePath.text
+
         self.CbWrapBody.setChecked(settings["wrap_body"])
         self.CbWrapPreview.setChecked(settings["wrap_preview"])
 
@@ -20,7 +22,6 @@ class SettingsWindow(QtWidgets.QDialog):
         self.LeSitePath.setText(settings["site_path"])
 
     def connect_signals(self):
-        self.LeSitePath.textChanged.connect(self.check_site_path)
         self.PbBrowseSitePath.clicked.connect(self.browse_site_path)
 
     def accept(self):
@@ -45,16 +46,6 @@ class SettingsWindow(QtWidgets.QDialog):
             )
 
         save_settings()
-
-    def check_site_path(self):
-        new_path = self.LeSitePath.text()
-
-        if path.exists(new_path):
-            self.LeSitePath.setStyleSheet("")
-        else:
-            self.LeSitePath.setStyleSheet("color: red")
-
-        self.LeSitePath.setToolTip(path.abspath(new_path))
 
     def browse_site_path(self):
         dialog = QtWidgets.QFileDialog(self)

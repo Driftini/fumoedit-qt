@@ -125,7 +125,7 @@
      <item row="3" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QLineEdit" name="LeSitePath"/>
+        <widget class="FilenameEdit" name="LeSitePath"/>
        </item>
        <item>
         <widget class="QPushButton" name="PbBrowseSitePath">
@@ -150,6 +150,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FilenameEdit</class>
+   <extends>QLineEdit</extends>
+   <header>widgets.FilenameEdit</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>CbWrapPreview</tabstop>
   <tabstop>CbWrapBody</tabstop>

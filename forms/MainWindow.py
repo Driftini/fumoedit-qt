@@ -2,6 +2,7 @@ from forms.SettingsWindow import SettingsWindow
 import fumoedit
 from os import path
 from PyQt5 import QtGui, QtWidgets, uic
+from settings import *
 import time
 from yaml.scanner import ScannerError
 
@@ -19,6 +20,8 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
         uic.loadUi("forms/WndMain.ui", self)
         self.connect_signals()
+        
+        self.check_settings()
 
         self.current_post = None
         self.current_picture = None
@@ -155,7 +158,34 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def show_settings(self):
         dialog = SettingsWindow(self)
-        dialog.showNormal()
+        if dialog.exec():
+            self.check_settings()
+
+    def check_settings(self):
+        # Read settings and configure widgets according to them
+        if settings["wrap_body"]:
+            self.PtePostBody.setLineWrapMode(
+                QtWidgets.QPlainTextEdit.LineWrapMode.WidgetWidth
+            )
+        else:
+            self.PtePostBody.setLineWrapMode(
+                QtWidgets.QPlainTextEdit.LineWrapMode.NoWrap
+            )
+        body_font = self.PtePostBody.font()
+        body_font.setPointSize(settings["fontsize_body"])
+        self.PtePostBody.setFont(body_font)
+
+        if settings["wrap_preview"]:
+            self.TePostBodyPreview.setLineWrapMode(
+                QtWidgets.QTextEdit.LineWrapMode.WidgetWidth
+                )
+        else:
+            self.TePostBodyPreview.setLineWrapMode(
+                QtWidgets.QTextEdit.LineWrapMode.NoWrap
+                )
+        preview_font = self.TePostBodyPreview.font()
+        preview_font.setPointSize(settings["fontsize_preview"])
+        self.TePostBodyPreview.setFont(preview_font)
 
     def closeEvent(self, event):
         # Override for the window's close event, prompts the user

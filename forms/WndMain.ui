@@ -51,6 +51,11 @@
             <property name="enabled">
              <bool>true</bool>
             </property>
+            <property name="font">
+             <font>
+              <family>Consolas</family>
+             </font>
+            </property>
             <property name="tabChangesFocus">
              <bool>true</bool>
             </property>

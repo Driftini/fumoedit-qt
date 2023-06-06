@@ -2,7 +2,6 @@ import fumoedit
 from os import path
 from PyQt5 import QtGui, QtWidgets, uic
 from settings import *
-import time
 from yaml.scanner import ScannerError
 
 

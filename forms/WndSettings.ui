@@ -42,7 +42,7 @@
      <item row="2" column="1">
       <widget class="QSpinBox" name="SbBodyFontSize">
        <property name="suffix">
-        <string>px</string>
+        <string>pt</string>
        </property>
        <property name="minimum">
         <number>7</number>
@@ -114,7 +114,7 @@
      <item row="3" column="1">
       <widget class="QSpinBox" name="SbPreviewFontSize">
        <property name="suffix">
-        <string>px</string>
+        <string>pt</string>
        </property>
        <property name="minimum">
         <number>7</number>

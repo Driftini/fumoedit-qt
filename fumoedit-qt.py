@@ -33,7 +33,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ActionNewPost.triggered.connect(self.new_post)
         self.ActionOpenPost.triggered.connect(self.open_post)
         self.ActionSavePost.triggered.connect(self.save_post)
-        # self.ActionSavePostAs.triggered.connect(self.export_post)
+        self.ActionSavePostAs.triggered.connect(self.save_post_as)
         self.ActionQuit.triggered.connect(self.close)
 
         # Post editor widgets

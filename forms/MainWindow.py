@@ -6,10 +6,10 @@ from settings import *
 import time
 from yaml.scanner import ScannerError
 
-# TODO custom widget for filename fields?
+# TODO use "dirname" in fumoedit module instead of pointlessly going for pathlib
 # TODO Confirmation when saving to a folder mismatching the post's collection
 # TODO Confirmation when saving with a internal name that mismatches the currently open file
-
+# TODO confiration on overwrite
 
 def currenttime():
     return time.strftime('%H:%M:%S', time.localtime())
@@ -33,10 +33,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LePostThumbName.path_part_2 = lambda: self.current_post.get_thumbnail_path()[1:]
 
         self.LeThumbFilename.path_part_1 = lambda: settings["site_path"]
-        self.LeThumbFilename.path_part_2 = lambda: self.current_picture.get_thumbnail_path()[1:]
+        self.LeThumbFilename.path_part_2 = self.getThumbPathWrapper
 
         self.LeVariantFilename.path_part_1 = lambda: settings["site_path"]
-        self.LeVariantFilename.path_part_2 = lambda: self.current_variant.get_path()[1:]
+        self.LeVariantFilename.path_part_2 = self.getVariantPathWrapper
 
         self.new_post()
 
@@ -208,6 +208,18 @@ class MainWindow(QtWidgets.QMainWindow):
         preview_font = self.TePostBodyPreview.font()
         preview_font.setPointSize(settings["fontsize_preview"])
         self.TePostBodyPreview.setFont(preview_font)
+
+    def getThumbPathWrapper(self):
+        if self.current_picture:
+            return self.current_picture.get_thumbnail_path()[1:]
+        else:
+            return ""
+
+    def getVariantPathWrapper(self):
+        if self.current_picture and self.current_variant:
+            return self.current_variant.get_path()[1:]
+        else:
+            return ""
 
     def closeEvent(self, event):
         # Override for the window's close event, prompts the user

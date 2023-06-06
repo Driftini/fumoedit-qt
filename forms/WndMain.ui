@@ -530,16 +530,11 @@
     <addaction name="ActionSavePost"/>
     <addaction name="ActionSavePostAs"/>
     <addaction name="separator"/>
+    <addaction name="ActionSettings"/>
+    <addaction name="separator"/>
     <addaction name="ActionQuit"/>
    </widget>
-   <widget class="QMenu" name="menuSettings">
-    <property name="title">
-     <string>Settings</string>
-    </property>
-    <addaction name="ActionPreferences"/>
-   </widget>
    <addaction name="MenuFile"/>
-   <addaction name="menuSettings"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="ActionNewPost">
@@ -582,9 +577,9 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="ActionPreferences">
+  <action name="ActionSettings">
    <property name="text">
-    <string>Preferences...</string>
+    <string>Settings...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+,</string>

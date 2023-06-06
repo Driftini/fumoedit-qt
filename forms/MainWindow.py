@@ -1,3 +1,4 @@
+from forms.SettingsWindow import SettingsWindow
 import fumoedit
 from os import path
 from PyQt5 import QtGui, QtWidgets, uic
@@ -33,6 +34,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ActionOpenPost.triggered.connect(self.open_post)
         self.ActionSavePost.triggered.connect(self.save_post)
         self.ActionSavePostAs.triggered.connect(self.save_post_as)
+        self.ActionSettings.triggered.connect(self.show_settings)
         self.ActionQuit.triggered.connect(self.close)
 
         # Post editor widgets
@@ -150,6 +152,10 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 return False
         return True
+
+    def show_settings(self):
+        dialog = SettingsWindow(self)
+        dialog.showNormal()
 
     def closeEvent(self, event):
         # Override for the window's close event, prompts the user

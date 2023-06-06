@@ -1,30 +1,35 @@
 import fumoedit
 import json
+import pickle
 from os import path
 
-SETTINGS_FILE = "feqt_settings.json"
+SETTINGS_FILE = "feqt_settings.pickle"
 
 # Default application-wide settings
 settings = {
-    "wordwrap": False,
+    "wrap_body": False,
+    "wrap_preview": False,
     "fontsize_body": 9,
     "fontsize_preview": 9,
     "site_path": "."
 }
 
+
 def load_settings():
-    if path.exists(SETTINGS_FILE):
-        with open(SETTINGS_FILE, encoding="utf-8") as f:
-            settings = json.load(f.read())
-    else:
+    try:
+        with open(SETTINGS_FILE, mode="br") as f:
+            _ = settings
+            _ = pickle.load(f)
+    except (OSError):
+        # If file doesn't exist, create one with default settings
         save_settings()
 
+
 def save_settings():
-    with open(SETTINGS_FILE, mode="w", encoding="utf-8") as f:
-        f.write(json.dump(settings))
+    with open(SETTINGS_FILE, mode="bw") as f:
+        pickle.dump(settings, f)
+
 
 def set_site_path(newpath):
     settings["site_path"] = newpath
-    fumoedit.site_root = newpath
-    
-    
+    fumoedit.SITE_ROOT = newpath

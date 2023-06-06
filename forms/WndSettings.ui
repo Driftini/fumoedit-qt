@@ -11,13 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Preferences - FumoEdit-QT</string>
+   <string>Settings - FumoEdit-QT</string>
   </property>
   <property name="modal">
    <bool>true</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="0" colspan="3">
+   <item row="1" column="0">
     <widget class="QDialogButtonBox" name="BbMain">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -27,20 +27,20 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item row="0" column="0">
     <layout class="QFormLayout" name="formLayout_2">
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
+     <item row="2" column="0">
+      <widget class="QLabel" name="LblBodyFontSize">
        <property name="text">
-        <string>Post body font size:</string>
+        <string>Body field font size:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::MarkdownText</enum>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QSpinBox" name="spinBox">
+     <item row="2" column="1">
+      <widget class="QSpinBox" name="SbBodyFontSize">
        <property name="suffix">
         <string>px</string>
        </property>
@@ -52,20 +52,20 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label">
+     <item row="4" column="0">
+      <widget class="QLabel" name="LblSitePath">
        <property name="text">
         <string>Path to FumoNet repository:</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
+     <item row="4" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QLineEdit" name="lineEdit"/>
+        <widget class="QLineEdit" name="LeSitePath"/>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="PbBrowseSitePath">
          <property name="text">
           <string>Browse...</string>
          </property>
@@ -73,27 +73,64 @@
        </item>
       </layout>
      </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="LblWrapBody">
+       <property name="text">
+        <string>Wrap body field:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QCheckBox" name="CbWrapBody">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="LblWrapPreview">
+       <property name="text">
+        <string>Wrap body preview:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="CbWrapPreview">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="LblPreviewFontSize">
+       <property name="text">
+        <string>Body preview font size:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::MarkdownText</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QSpinBox" name="SbPreviewFontSize">
+       <property name="suffix">
+        <string>px</string>
+       </property>
+       <property name="minimum">
+        <number>7</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
      <item row="5" column="0" colspan="2">
-      <widget class="QLabel" name="label_3">
+      <widget class="QLabel" name="LblSitePathDescription">
        <property name="text">
         <string>This is used to preview post thumbnails and verify the existence of the filenames that are typed into certain fields.</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Wrap post body:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QCheckBox" name="checkBox">
-       <property name="text">
-        <string/>
        </property>
       </widget>
      </item>

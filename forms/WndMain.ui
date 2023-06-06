@@ -27,7 +27,7 @@
     <item row="0" column="1">
      <widget class="QTabWidget" name="TwMain">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="TabPostEditor">
        <attribute name="title">
@@ -237,6 +237,13 @@
              </property>
             </widget>
            </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="PbPictureDelete">
+             <property name="text">
+              <string>Delete</string>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="0" colspan="2">
             <widget class="QTableWidget" name="TwPictures">
              <property name="editTriggers">
@@ -270,153 +277,6 @@
                <string>Thumbnail</string>
               </property>
              </column>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QPushButton" name="PbPictureDelete">
-             <property name="text">
-              <string>Delete</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QGroupBox" name="GbPicMan2">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>2</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="title">
-           <string>2. Configure picture thumbnail</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_8" columnstretch="0,0,1,1,0,2">
-           <item row="0" column="5" rowspan="5" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-            <widget class="QGraphicsView" name="GvThumbPreview">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>388</width>
-               <height>128</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>388</width>
-               <height>128</height>
-              </size>
-             </property>
-             <property name="verticalScrollBarPolicy">
-              <enum>Qt::ScrollBarAlwaysOff</enum>
-             </property>
-             <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarAlwaysOff</enum>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-             </property>
-             <property name="transformationAnchor">
-              <enum>QGraphicsView::NoAnchor</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="QSpinBox" name="SbThumbX">
-             <property name="suffix">
-              <string>px</string>
-             </property>
-             <property name="maximum">
-              <number>512</number>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="3">
-            <widget class="QCheckBox" name="CbThumbCenterX">
-             <property name="text">
-              <string>Center</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0" alignment="Qt::AlignRight">
-            <widget class="QLabel" name="LblThumbFilename">
-             <property name="text">
-              <string>Filename:</string>
-             </property>
-             <property name="buddy">
-              <cstring>LeThumbFilename</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLabel" name="LblThumbX">
-             <property name="text">
-              <string>X:</string>
-             </property>
-             <property name="buddy">
-              <cstring>SbThumbX</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="QSpinBox" name="SbThumbY">
-             <property name="suffix">
-              <string>px</string>
-             </property>
-             <property name="maximum">
-              <number>512</number>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0" alignment="Qt::AlignRight">
-            <widget class="QLabel" name="LblThumbOffsets">
-             <property name="text">
-              <string>Offsets:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="3">
-            <widget class="QCheckBox" name="CbThumbCenterY">
-             <property name="text">
-              <string>Center</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLabel" name="LblThumbY">
-             <property name="text">
-              <string>Y:</string>
-             </property>
-             <property name="buddy">
-              <cstring>SbThumbY</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1" colspan="3">
-            <widget class="QLineEdit" name="LeThumbFilename"/>
-           </item>
-           <item row="1" column="0" alignment="Qt::AlignRight">
-            <widget class="QLabel" name="LblThumbActualPath">
-             <property name="text">
-              <string>Actual path:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1" colspan="3">
-            <widget class="QLineEdit" name="LeThumbActualPath">
-             <property name="readOnly">
-              <bool>true</bool>
-             </property>
             </widget>
            </item>
           </layout>
@@ -504,6 +364,132 @@
             <widget class="QPushButton" name="PbVariantNew">
              <property name="text">
               <string>New</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QGroupBox" name="GbPicMan2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>2</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="title">
+           <string>2. Configure picture thumbnail</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_8" columnstretch="0,0,1,1,1">
+           <item row="2" column="2">
+            <widget class="QSpinBox" name="SbThumbY">
+             <property name="suffix">
+              <string>px</string>
+             </property>
+             <property name="maximum">
+              <number>512</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" alignment="Qt::AlignRight">
+            <widget class="QLabel" name="LblThumbFilename">
+             <property name="text">
+              <string>Filename:</string>
+             </property>
+             <property name="buddy">
+              <cstring>LeThumbFilename</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4" rowspan="4" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+            <widget class="QGraphicsView" name="GvThumbPreview">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>388</width>
+               <height>128</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>388</width>
+               <height>128</height>
+              </size>
+             </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+             </property>
+             <property name="transformationAnchor">
+              <enum>QGraphicsView::NoAnchor</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="LblThumbY">
+             <property name="text">
+              <string>Y:</string>
+             </property>
+             <property name="buddy">
+              <cstring>SbThumbY</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="LblThumbX">
+             <property name="text">
+              <string>X:</string>
+             </property>
+             <property name="buddy">
+              <cstring>SbThumbX</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1" colspan="3">
+            <widget class="QLineEdit" name="LeThumbFilename"/>
+           </item>
+           <item row="1" column="0" alignment="Qt::AlignRight">
+            <widget class="QLabel" name="LblThumbOffsets">
+             <property name="text">
+              <string>Offsets:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QSpinBox" name="SbThumbX">
+             <property name="suffix">
+              <string>px</string>
+             </property>
+             <property name="maximum">
+              <number>512</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="3">
+            <widget class="QCheckBox" name="CbThumbCenterY">
+             <property name="text">
+              <string>Center</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <widget class="QCheckBox" name="CbThumbCenterX">
+             <property name="text">
+              <string>Center</string>
              </property>
             </widget>
            </item>
@@ -599,12 +585,15 @@
   <tabstop>LePostTitle</tabstop>
   <tabstop>CbPostCollection</tabstop>
   <tabstop>LePostThumbName</tabstop>
+  <tabstop>CbPostPreview</tabstop>
+  <tabstop>CbPostPreviewAutoscroll</tabstop>
+  <tabstop>PtePostBody</tabstop>
+  <tabstop>TePostBodyPreview</tabstop>
   <tabstop>TwMain</tabstop>
   <tabstop>TwPictures</tabstop>
   <tabstop>PbPictureDelete</tabstop>
   <tabstop>PbPictureNew</tabstop>
   <tabstop>LeThumbFilename</tabstop>
-  <tabstop>GvThumbPreview</tabstop>
   <tabstop>SbThumbX</tabstop>
   <tabstop>CbThumbCenterX</tabstop>
   <tabstop>SbThumbY</tabstop>
@@ -614,6 +603,7 @@
   <tabstop>LeVariantLabel</tabstop>
   <tabstop>PbVariantDelete</tabstop>
   <tabstop>PbVariantNew</tabstop>
+  <tabstop>GvThumbPreview</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -625,11 +615,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>468</x>
-     <y>174</y>
+     <y>143</y>
     </hint>
     <hint type="destinationlabel">
      <x>396</x>
-     <y>176</y>
+     <y>145</y>
     </hint>
    </hints>
   </connection>
@@ -641,11 +631,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>487</x>
-     <y>198</y>
+     <y>167</y>
     </hint>
     <hint type="destinationlabel">
      <x>408</x>
-     <y>200</y>
+     <y>169</y>
     </hint>
    </hints>
   </connection>

@@ -19,10 +19,9 @@ class SettingsWindow(QtWidgets.QDialog):
 
         self.LeSitePath.setText(settings["site_path"])
 
-        
-
     def connect_signals(self):
-        pass
+        self.LeSitePath.textChanged.connect(self.check_site_path)
+        self.PbBrowseSitePath.clicked.connect(self.browse_site_path)
 
     def accept(self):
         # Override to apply settings upon pressing OK
@@ -31,19 +30,34 @@ class SettingsWindow(QtWidgets.QDialog):
 
     def apply_settings(self):
         settings["wrap_body"] = self.CbWrapBody.isChecked()
-        settings["wrap_preview"] = self.CbWrapBody.isChecked()
+        settings["wrap_preview"] = self.CbWrapPreview.isChecked()
         settings["fontsize_body"] = int(self.SbBodyFontSize.cleanText())
         settings["fontsize_preview"] = int(self.SbPreviewFontSize.cleanText())
-        
+
         input_path = self.LeSitePath.text()
+        absolute = path.abspath(input_path)
         if path.exists(input_path):
             set_site_path(input_path)
         else:
             QtWidgets.QMessageBox.warning(
                 self, "Invalid repository path",
-                f"{input_path} does not exist.\nThis setting will not be applied."
+                f"{absolute} does not exist.\nThis setting will not be applied."
             )
 
         save_settings()
-        
-        
+
+    def check_site_path(self):
+        new_path = self.LeSitePath.text()
+
+        if path.exists(new_path):
+            self.LeSitePath.setStyleSheet("")
+        else:
+            self.LeSitePath.setStyleSheet("color: red")
+
+        self.LeSitePath.setToolTip(path.abspath(new_path))
+
+    def browse_site_path(self):
+        dialog = QtWidgets.QFileDialog(self)
+        dialog.setFileMode(QtWidgets.QFileDialog.DirectoryOnly)
+        if dialog.exec():
+            self.LeSitePath.setText(dialog.selectedFiles()[0])

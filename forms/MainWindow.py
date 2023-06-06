@@ -6,7 +6,7 @@ from settings import *
 import time
 from yaml.scanner import ScannerError
 
-# TODO configuration for word wrap, font size and site root
+# TODO custom widget for filename fields?
 # TODO Confirmation when saving to a folder mismatching the post's collection
 # TODO Confirmation when saving with a internal name that mismatches the currently open file
 
@@ -20,7 +20,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
         uic.loadUi("forms/WndMain.ui", self)
         self.connect_signals()
-        
+
         self.check_settings()
 
         self.current_post = None
@@ -46,6 +46,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.CbPostCollection.currentTextChanged.connect(
             self.set_post_collection
         )
+        self.LePostThumbName.textChanged.connect(self.check_post_thumbnail)
         self.PtePostBody.textChanged.connect(self.update_post_preview)
 
         # Picture manager widgets (pictures)
@@ -64,6 +65,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.TwVariants.itemSelectionChanged.connect(
             self.variant_selection_changed
         )
+        self.LeVariantFilename.textChanged.connect(self.check_variant_filename)
         self.PbVariantNew.clicked.connect(self.add_variant)
         self.PbVariantDelete.clicked.connect(self.delete_variant)
 
@@ -178,11 +180,11 @@ class MainWindow(QtWidgets.QMainWindow):
         if settings["wrap_preview"]:
             self.TePostBodyPreview.setLineWrapMode(
                 QtWidgets.QTextEdit.LineWrapMode.WidgetWidth
-                )
+            )
         else:
             self.TePostBodyPreview.setLineWrapMode(
                 QtWidgets.QTextEdit.LineWrapMode.NoWrap
-                )
+            )
         preview_font = self.TePostBodyPreview.font()
         preview_font.setPointSize(settings["fontsize_preview"])
         self.TePostBodyPreview.setFont(preview_font)
@@ -244,7 +246,7 @@ class MainWindow(QtWidgets.QMainWindow):
             msg = f"{filepath}'s name is invalid."
 
         # could use rich text
-        msg += f" ({e_type.__name__})\n\nDetails:\n{exception}"
+        msg += f" ({e_type.__name__})"
 
         QtWidgets.QMessageBox.critical(self, "Failed to open post", msg)
 
@@ -293,7 +295,6 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.validate_post():
             dialog = QtWidgets.QFileDialog(self)
             dialog.setFileMode(QtWidgets.QFileDialog.DirectoryOnly)
-            dialog.setNameFilter("Markdown files (*.md)")
 
             if dialog.exec():
                 self.set_current_filepath(dialog.selectedFiles()[0])
@@ -360,6 +361,21 @@ class MainWindow(QtWidgets.QMainWindow):
         # Enable or disable the picture manager depending on whether or not
         # the current post is a picture post
         self.TwMain.setTabEnabled(1, self.current_post.is_picturepost())
+
+    def check_post_thumbnail(self):
+        self.current_post.thumbnail = self.LePostThumbName.text()
+
+        actual_path = path.join(
+            settings["site_path"],
+            self.current_post.get_thumbnail_path()[1:] # remove 1st slash
+        )
+
+        if path.exists(actual_path):
+            self.LePostThumbName.setStyleSheet("")
+        else:
+            self.LePostThumbName.setStyleSheet("color: red")
+
+        self.LePostThumbName.setToolTip(path.abspath(actual_path))
 
     def update_post_preview(self):
         # Update the Markdown preview of the post body, while retaining
@@ -428,7 +444,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Saving the pic outside of save method is painful
         self.current_picture.thumbnail_name = self.LeThumbFilename.text()
-        absolute = path.abspath(self.current_picture.get_thumbnail_path())
+
+        actual_path = path.join(
+            settings["site_path"],
+            self.current_picture.get_thumbnail_path()[1:]
+        )
+        absolute = path.abspath(actual_path)
 
         # I don't think I should instance a new scene every time
         scene = QtWidgets.QGraphicsScene()
@@ -463,6 +484,8 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.GvThumbPreview.setScene(scene)
             self.LeThumbFilename.setStyleSheet("color: red")
+        
+        self.LeThumbFilename.setToolTip(absolute)
 
     def add_picture(self):
         # Add a new empty picture to the current post
@@ -528,6 +551,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.PbPictureDelete.setEnabled(True)
         self.PbVariantNew.setEnabled(True)
         self.GbPicMan2.setEnabled(True)
+        self.update_thumbnail_preview()
 
     def deselect_picture(self):
         # If there's already a loaded picture, save its edits beforehand
@@ -634,6 +658,22 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.current_picture and self.current_variant:
             self.current_picture.variants.remove(self.current_variant)
             self.update_variants_table(True)
+
+    def check_variant_filename(self):
+        if self.current_picture and self.current_variant:
+            self.current_variant.filename = self.LeVariantFilename.text()
+
+            actual_path = path.join(
+                settings["site_path"],
+                self.current_variant.get_path()[1:]
+            )
+
+            if path.exists(actual_path):
+                self.LeVariantFilename.setStyleSheet("")
+            else:
+                self.LeVariantFilename.setStyleSheet("color: red")
+
+            self.LeVariantFilename.setToolTip(path.abspath(actual_path))
 
     def validate_variant(self):
         # TODO

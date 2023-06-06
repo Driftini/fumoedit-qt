@@ -11,7 +11,7 @@ settings = {
     "wrap_preview": True,
     "fontsize_body": 8,
     "fontsize_preview": 9,
-    "site_path": "."
+    "site_path": "/"
 }
 
 
@@ -31,4 +31,3 @@ def save_settings():
 
 def set_site_path(newpath):
     settings["site_path"] = newpath
-    fumoedit.SITE_ROOT = newpath

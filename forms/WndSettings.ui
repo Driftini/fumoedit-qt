@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>Dialog</class>
  <widget class="QDialog" name="Dialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -17,7 +20,10 @@
    <bool>true</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetFixedSize</enum>
+   </property>
+   <item row="4" column="0">
     <widget class="QDialogButtonBox" name="BbMain">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -29,7 +35,32 @@
    </item>
    <item row="0" column="0">
     <layout class="QFormLayout" name="formLayout_2">
-     <item row="2" column="0">
+     <item row="0" column="0">
+      <widget class="QLabel" name="LblWrapBody">
+       <property name="text">
+        <string>Word wrap:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QCheckBox" name="CbWrapPreview">
+         <property name="text">
+          <string>Body field</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="CbWrapBody">
+         <property name="text">
+          <string>Body preview</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="1" column="0">
       <widget class="QLabel" name="LblBodyFontSize">
        <property name="text">
         <string>Body field font size:</string>
@@ -37,9 +68,12 @@
        <property name="textFormat">
         <enum>Qt::MarkdownText</enum>
        </property>
+       <property name="buddy">
+        <cstring>SbBodyFontSize</cstring>
+       </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="1" column="1">
       <widget class="QSpinBox" name="SbBodyFontSize">
        <property name="suffix">
         <string>pt</string>
@@ -52,14 +86,43 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="2" column="0">
+      <widget class="QLabel" name="LblPreviewFontSize">
+       <property name="text">
+        <string>Body preview font size:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::MarkdownText</enum>
+       </property>
+       <property name="buddy">
+        <cstring>SbPreviewFontSize</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QSpinBox" name="SbPreviewFontSize">
+       <property name="suffix">
+        <string>pt</string>
+       </property>
+       <property name="minimum">
+        <number>7</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
       <widget class="QLabel" name="LblSitePath">
        <property name="text">
         <string>Path to FumoNet repository:</string>
        </property>
+       <property name="buddy">
+        <cstring>LeSitePath</cstring>
+       </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="3" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QLineEdit" name="LeSitePath"/>
@@ -73,58 +136,7 @@
        </item>
       </layout>
      </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="LblWrapBody">
-       <property name="text">
-        <string>Wrap body field:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QCheckBox" name="CbWrapBody">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="LblWrapPreview">
-       <property name="text">
-        <string>Wrap body preview:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QCheckBox" name="CbWrapPreview">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="LblPreviewFontSize">
-       <property name="text">
-        <string>Body preview font size:</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::MarkdownText</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QSpinBox" name="SbPreviewFontSize">
-       <property name="suffix">
-        <string>pt</string>
-       </property>
-       <property name="minimum">
-        <number>7</number>
-       </property>
-       <property name="maximum">
-        <number>100</number>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0" colspan="2">
+     <item row="4" column="0" colspan="2">
       <widget class="QLabel" name="LblSitePathDescription">
        <property name="text">
         <string>This is used to preview post thumbnails and verify the existence of the filenames that are typed into certain fields.</string>
@@ -138,6 +150,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>CbWrapPreview</tabstop>
+  <tabstop>CbWrapBody</tabstop>
+  <tabstop>SbBodyFontSize</tabstop>
+  <tabstop>SbPreviewFontSize</tabstop>
+  <tabstop>LeSitePath</tabstop>
+  <tabstop>PbBrowseSitePath</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -445,12 +445,12 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.CbThumbCenterX.isChecked():
                 offset[0] = "center"
             else:
-                offset[0] = self.SbThumbX.value()
+                offset[0] = -self.SbThumbX.value()
 
             if self.CbThumbCenterY.isChecked():
                 offset[1] = "center"
             else:
-                offset[1] = self.SbThumbY.value()
+                offset[1] = -self.SbThumbY.value()
 
             self.current_picture.thumbnail_offset = offset
 
@@ -479,14 +479,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.SbThumbX.setValue(0)
         else:
             self.CbThumbCenterX.setChecked(False)
-            self.SbThumbX.setValue(self.current_picture.thumbnail_offset[0])
+            self.SbThumbX.setValue(-self.current_picture.thumbnail_offset[0])
 
         if center_y:
             self.CbThumbCenterY.setChecked(True)
             self.SbThumbY.setValue(0)
         else:
             self.CbThumbCenterY.setChecked(False)
-            self.SbThumbY.setValue(self.current_picture.thumbnail_offset[1])
+            self.SbThumbY.setValue(-self.current_picture.thumbnail_offset[1])
 
         self.update_variants_table(True)
         self.TwVariants.setEnabled(True)

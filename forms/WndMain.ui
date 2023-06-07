@@ -66,9 +66,6 @@
             <property name="enabled">
              <bool>true</bool>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>

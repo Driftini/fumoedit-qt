@@ -2,6 +2,7 @@ from forms.SettingsWindow import SettingsWindow
 import fumoedit
 from os import path
 from PyQt5 import QtGui, QtWidgets, uic
+from PyQt5.QtCore import Qt
 from settings import *
 import time
 from yaml.scanner import ScannerError
@@ -10,6 +11,7 @@ from yaml.scanner import ScannerError
 # TODO Confirmation when saving to a folder mismatching the post's collection
 # TODO Confirmation when saving with a internal name that mismatches the currently open file
 # TODO confiration on overwrite
+
 
 def currenttime():
     return time.strftime('%H:%M:%S', time.localtime())
@@ -33,10 +35,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LePostThumbName.path_part_2 = lambda: self.current_post.get_thumbnail_path()[1:]
 
         self.LeThumbFilename.path_part_1 = lambda: settings["site_path"]
-        self.LeThumbFilename.path_part_2 = self.getThumbPathWrapper
+        self.LeThumbFilename.path_part_2 = self.get_thumb_path_wrapper
 
         self.LeVariantFilename.path_part_1 = lambda: settings["site_path"]
-        self.LeVariantFilename.path_part_2 = self.getVariantPathWrapper
+        self.LeVariantFilename.path_part_2 = self.get_variant_path_wrapper
 
         self.new_post()
 
@@ -59,6 +61,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # is what FilenameEdit uses for checks
         self.LePostThumbName.textEdited.connect(self.post_thumbnail_changed)
         self.PtePostBody.textChanged.connect(self.update_post_preview)
+        self.TePostBodyPreview.wheelEvent = self.post_preview_wheeloverride
 
         # Picture manager widgets (pictures)
         self.TwPictures.itemSelectionChanged.connect(
@@ -209,17 +212,25 @@ class MainWindow(QtWidgets.QMainWindow):
         preview_font.setPointSize(settings["fontsize_preview"])
         self.TePostBodyPreview.setFont(preview_font)
 
-    def getThumbPathWrapper(self):
+    def get_thumb_path_wrapper(self):
         if self.current_picture:
             return self.current_picture.get_thumbnail_path()[1:]
         else:
             return ""
 
-    def getVariantPathWrapper(self):
+    def get_variant_path_wrapper(self):
         if self.current_picture and self.current_variant:
             return self.current_variant.get_path()[1:]
         else:
             return ""
+
+    def post_preview_wheeloverride(self, event):
+        # Prevent manually zooming the post body preview,
+        # font size can be set in the settings
+        if (
+            event.modifiers() & (1 << Qt.KeyboardModifier.ControlModifier)
+        ) > 0:
+            QtWidgets.QTextEdit.wheelEvent(self.TePostBodyPreview, event)
 
     def closeEvent(self, event):
         # Override for the window's close event, prompts the user

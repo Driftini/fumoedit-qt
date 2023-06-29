@@ -470,45 +470,52 @@ class MainWindow(QtWidgets.QMainWindow):
         # Update the picture in the thumbnail preview box,
         # while applying offsets from the relevant fields
 
-        # Saving the pic outside of save method is painful
-        self.current_picture.thumbnail_name = self.LeThumbFilename.text()
-
-        actual_path = path.join(
-            settings["site_path"],
-            self.current_picture.get_thumbnail_path()[1:]
-        )
-        absolute = path.abspath(actual_path)
-
         # I don't think I should instance a new scene every time
         scene = QtWidgets.QGraphicsScene()
 
-        # If the file exists...
-        if path.exists(absolute):
-            pixmap = QtGui.QPixmap(absolute)
-            scene.addPixmap(pixmap)
-            self.GvThumbPreview.setScene(scene)
+        if self.current_picture:
+            # Saving the pic outside of save method is painful
+            self.current_picture.thumbnail_name = self.LeThumbFilename.text()
 
-            # Prepare offsets
-            offset_x = 0
-            offset_y = 0
+            actual_path = path.join(
+                settings["site_path"],
+                self.current_picture.get_thumbnail_path()[1:]
+            )
+            absolute = path.abspath(actual_path)
 
-            if self.CbThumbCenterX.isChecked():
-                offset_x = pixmap.width() / 2
-                offset_x -= self.GvThumbPreview.width() / 2
-            else:
-                offset_x = self.SbThumbX.cleanText()
+            # If the file exists...
+            if path.exists(absolute):
+                pixmap = QtGui.QPixmap(absolute)
+                scene.addPixmap(pixmap)
+                self.GvThumbPreview.setScene(scene)
 
-            if self.CbThumbCenterY.isChecked():
-                offset_y = pixmap.height() / 2
-                offset_y -= self.GvThumbPreview.height() / 2
-            else:
-                offset_y = self.SbThumbY.cleanText()
+                # Prepare offsets
+                offset_x = 0
+                offset_y = 0
 
-            # Apply offsets
-            self.GvThumbPreview.horizontalScrollBar().setValue(int(offset_x))
-            self.GvThumbPreview.verticalScrollBar().setValue(int(offset_y))
-        else:
-            self.GvThumbPreview.setScene(scene)
+                if self.CbThumbCenterX.isChecked():
+                    offset_x = pixmap.width() / 2
+                    offset_x -= self.GvThumbPreview.width() / 2
+                else:
+                    offset_x = self.SbThumbX.cleanText()
+
+                if self.CbThumbCenterY.isChecked():
+                    offset_y = pixmap.height() / 2
+                    offset_y -= self.GvThumbPreview.height() / 2
+                else:
+                    offset_y = self.SbThumbY.cleanText()
+
+                # Apply offsets
+                self.GvThumbPreview.horizontalScrollBar().setValue(int(offset_x))
+                self.GvThumbPreview.verticalScrollBar().setValue(int(offset_y))
+
+                return
+
+        # This is only reached if the file doesn't exist
+        # or if there's no selected picture
+        self.GvThumbPreview.setScene(scene)
+
+
 
     def add_picture(self):
         # Add a new empty picture to the current post
@@ -590,6 +597,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.SbThumbY.setValue(0)
         self.CbThumbCenterX.setChecked(False)
         self.CbThumbCenterY.setChecked(False)
+        self.update_thumbnail_preview()
 
         self.update_variants_table(True)
         self.TwVariants.setEnabled(False)

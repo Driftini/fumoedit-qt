@@ -1,8 +1,6 @@
-import fumoedit
 from os import path
-from PyQt5 import QtGui, QtWidgets, uic
+from PyQt5 import QtWidgets, uic
 from settings import *
-from yaml.scanner import ScannerError
 
 
 class SettingsWindow(QtWidgets.QDialog):

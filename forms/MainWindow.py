@@ -7,7 +7,6 @@ from settings import *
 import time
 from yaml.scanner import ScannerError
 
-# TODO use "dirname" in fumoedit module instead of pointlessly going for pathlib
 # TODO Confirmation when saving to a folder mismatching the post's collection
 # TODO Confirmation when saving with a internal name that mismatches the currently open file
 # TODO confiration on overwrite
@@ -305,7 +304,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Set filepath again, just in case
         # the post's internal name has been changed
-        fp = f"{fumoedit.get_folderpath(self.current_filepath)}/{self.current_post.get_filename()}"
+        fp = f"{path.dirname(self.current_filepath)}/{self.current_post.get_filename()}"
         self.set_current_filepath(fp)
 
         self.current_post.title = self.LePostTitle.text()
@@ -317,7 +316,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         fumoedit.post_to_file(
             self.current_post,
-            fumoedit.get_folderpath(self.current_filepath)
+            path.dirname(self.current_filepath)
         )
 
         self.undirty()
@@ -340,7 +339,13 @@ class MainWindow(QtWidgets.QMainWindow):
             dialog.setFileMode(QtWidgets.QFileDialog.DirectoryOnly)
 
             if dialog.exec():
-                self.set_current_filepath(dialog.selectedFiles()[0])
+                # Proper filepath will be set by save_post_internal,
+                # "placeholder" is appended so save_post_internal doesn't
+                # shave off the directory name from the filepath
+                # (which would actually point to a folder)
+                fp = f"{dialog.selectedFiles()[0]}/placeholder"
+                self.set_current_filepath(fp)
+
                 self.save_post_internal()
 
     # Post methods

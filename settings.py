@@ -1,7 +1,4 @@
-import fumoedit
-import json
 import pickle
-from os import path
 
 SETTINGS_FILE = "feqt_settings.pickle"
 

@@ -1,3 +1,4 @@
+from datetime import date
 from forms.SettingsWindow import SettingsWindow
 import fumoedit
 from os import path
@@ -6,10 +7,6 @@ from PyQt5.QtCore import Qt
 from settings import *
 import time
 from yaml.scanner import ScannerError
-
-# TODO Confirmation when saving to a folder mismatching the post's collection
-# TODO Confirmation when saving with a internal name that mismatches the currently open file
-# TODO confiration on overwrite
 
 
 def currenttime():
@@ -156,16 +153,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def discard_confirmation(self):
         # If the current file is dirty, ask for
-        # confirmation before possibly discarding changes
+        # confirmation before continuing
         if self.dirty_file:
             msgbox = QtWidgets.QMessageBox()
-            msgbox.setWindowTitle("Discard changes?")
-            msgbox.setText(
-                "There might be unsaved changes in the current post.\nDo you want to discard them?"
-            )
             msgbox.setIcon(QtWidgets.QMessageBox.Warning)
-            msgbox.addButton(QtWidgets.QMessageBox.StandardButton.Discard)
-            msgbox.addButton(QtWidgets.QMessageBox.StandardButton.Cancel)
 
             reply = msgbox.question(
                 self, "Discard changes?",
@@ -174,10 +165,73 @@ class MainWindow(QtWidgets.QMainWindow):
                 QtWidgets.QMessageBox.Cancel
             )
 
-            if reply == QtWidgets.QMessageBox.StandardButton.Discard:
-                return True
-            else:
-                return False
+            return reply == QtWidgets.QMessageBox.StandardButton.Discard
+        # Continue automatically if the file isn't dirty
+        return True
+
+    def overwrite_confirmation(self, filepath):
+        # If the given filepath exists, ask for
+        # confirmation before continuing
+        if path.exists(filepath):
+            msgbox = QtWidgets.QMessageBox()
+            msgbox.setIcon(QtWidgets.QMessageBox.Warning)
+
+            reply = msgbox.question(
+                self, "Overwrite file?",
+                "The selected path already exists.\nDo you want to overwrite it?",
+                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel,
+                QtWidgets.QMessageBox.Cancel
+            )
+
+            return reply == QtWidgets.QMessageBox.StandardButton.Yes
+        # Continue automatically if the filepath doesn't exist
+        return True
+
+    def collection_mismatch_confirmation(self, collection):
+        # If there's a mismatch between the current post's collection
+        # and the folder it's being saved into, ask for
+        # confirmation before continuing
+        if (
+            self.current_post.get_collection() != collection
+            or self.current_picture.get_collection() != "_" + collection
+        ):
+            msgbox = QtWidgets.QMessageBox()
+            msgbox.setIcon(QtWidgets.QMessageBox.Warning)
+
+            reply = msgbox.question(
+                self, "Collection mismatch",
+                f"The selected folder doesn't match this post's collection.\nDo you want to save this post while discarding its current collection?",
+                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel,
+                QtWidgets.QMessageBox.Cancel
+            )
+
+            return reply == QtWidgets.QMessageBox.StandardButton.Yes
+        # Continue automatically if there's no collection mismatch
+        return True
+
+    def internal_name_mismatch_confirmation(self):
+        # If there's a mismatch between the current post's collection
+        # and the folder it's being saved into, ask for
+        # confirmation before continuing
+        if self.current_filepath:
+            i_n = self.current_post.get_internal_name()
+            last_i_n = path.basename(self.current_filepath)[:-3]
+
+            if i_n != last_i_n:
+                msgbox = QtWidgets.QMessageBox()
+                msgbox.setIcon(QtWidgets.QMessageBox.Warning)
+
+
+                reply = msgbox.question(
+                    self, "Internal name mismatch",
+                    f"This post's internal name has been changed from \"{last_i_n}\" to \"{i_n}\".\nSave with the new internal name?",
+                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel,
+                    QtWidgets.QMessageBox.Cancel
+                )
+
+                return reply == QtWidgets.QMessageBox.StandardButton.Yes
+        # Continue automatically if there's no internal name mismatch
+        # or if the post is being saved for the first time
         return True
 
     def show_settings(self):
@@ -230,6 +284,24 @@ class MainWindow(QtWidgets.QMainWindow):
             event.modifiers() & (1 << Qt.KeyboardModifier.ControlModifier)
         ) > 0:
             QtWidgets.QTextEdit.wheelEvent(self.TePostBodyPreview, event)
+
+    def collection_to_display_name(self, collection_name):
+        match collection_name:
+            case "posts":
+                return "Blog"
+            case "walls":
+                return "Wallpapers"
+            case _:
+                return collection_name.capitalize()
+
+    def display_to_collection_name(self, display_name):
+        match display_name:
+            case "Blog":
+                return "posts"
+            case "Wallpapers":
+                return "walls"
+            case _:
+                return display_name.lower()
 
     def closeEvent(self, event):
         # Override for the window's close event, prompts the user
@@ -292,34 +364,41 @@ class MainWindow(QtWidgets.QMainWindow):
 
         QtWidgets.QMessageBox.critical(self, "Failed to open post", msg)
 
-    def save_post_internal(self):
+    def save_post_internal(self, folderpath):
         # Set post properties to the GUI's fields' values,
         # NOT to be called directly
-        self.current_post.id = self.LePostID.text()
 
-        d_day = self.DePostDate.date().day()
-        d_month = self.DePostDate.date().month()
-        d_year = self.DePostDate.date().year()
-        self.current_post.set_date(d_year, d_month, d_day)
+        if (
+            self.internal_name_mismatch_confirmation()
+            and self.collection_mismatch_confirmation(
+                fumoedit.get_foldername(self.current_filepath)
+            )
+        ):
+            self.current_post.id = self.LePostID.text()
 
-        # Set filepath again, just in case
-        # the post's internal name has been changed
-        fp = f"{path.dirname(self.current_filepath)}/{self.current_post.get_filename()}"
-        self.set_current_filepath(fp)
+            d_day = self.DePostDate.date().day()
+            d_month = self.DePostDate.date().month()
+            d_year = self.DePostDate.date().year()
+            self.current_post.set_date(d_year, d_month, d_day)
 
-        self.current_post.title = self.LePostTitle.text()
-        self.current_post.thumbnail = self.LePostThumbName.text()
-        self.current_post.body = self.PtePostBody.toPlainText()
+            # Set filepath again, just in case
+            # the post's internal name has been changed
+            fp = f"{folderpath}/{self.current_post.get_filename()}"
+            self.set_current_filepath(fp)
 
-        self.save_variant()
-        self.save_picture()
+            self.current_post.title = self.LePostTitle.text()
+            self.current_post.thumbnail = self.LePostThumbName.text()
+            self.current_post.body = self.PtePostBody.toPlainText()
 
-        fumoedit.post_to_file(
-            self.current_post,
-            path.dirname(self.current_filepath)
-        )
+            self.save_variant()
+            self.save_picture()
 
-        self.undirty()
+            fumoedit.post_to_file(
+                self.current_post,
+                path.dirname(self.current_filepath)
+            )
+
+            self.undirty()
 
     def save_post(self):
         # Immediately save the current post if it already
@@ -329,7 +408,8 @@ class MainWindow(QtWidgets.QMainWindow):
             if not self.current_filepath:
                 self.save_post_as()
             else:
-                self.save_post_internal()
+                folderpath = path.dirname(self.current_filepath)
+                self.save_post_internal(folderpath)
 
     def save_post_as(self):
         # Present a dialog to choose the save directory,
@@ -343,10 +423,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 # "placeholder" is appended so save_post_internal doesn't
                 # shave off the directory name from the filepath
                 # (which would actually point to a folder)
-                fp = f"{dialog.selectedFiles()[0]}/placeholder"
-                self.set_current_filepath(fp)
-
-                self.save_post_internal()
+                folderpath = dialog.selectedFiles()[0]
+                if self.overwrite_confirmation(folderpath):
+                    self.save_post_internal(folderpath)
 
     # Post methods
     def new_post(self):
@@ -378,13 +457,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.update_pictures_table(True)
         self.update_variants_table(True)
 
-        match self.current_post.get_collection():
-            case "posts":
-                self.CbPostCollection.setCurrentText("Blog")
-            case "artwork":
-                self.CbPostCollection.setCurrentText("Artwork")
-            case "walls":
-                self.CbPostCollection.setCurrentText("Wallpapers")
+        self.CbPostCollection.setCurrentText(
+            self.collection_to_display_name(self.current_post.get_collection())
+        )
 
     def update_internal_name(self):
         d_day = self.DePostDate.date().day()
@@ -398,13 +473,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def set_post_collection(self, collection):
         # Set the current post's collection
         # using the latters' "pretty names"
-        match collection:
-            case "Blog":
-                self.current_post.set_collection("posts")
-            case "Artwork":
-                self.current_post.set_collection("artwork")
-            case "Wallpapers":
-                self.current_post.set_collection("walls")
+        self.current_post.set_collection(
+            self.display_to_collection_name(collection)
+        )
 
         # Enable or disable the picture manager depending on whether or not
         # the current post is a picture post

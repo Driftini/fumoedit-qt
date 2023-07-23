@@ -10,11 +10,11 @@ class FilenameEdit(QtWidgets.QLineEdit):
 
     def path_part_1(self):
         # To override
-        return " "
+        return ""
 
     def path_part_2(self):
         # To override
-        return " "
+        return ""
 
     def check_path(self):
         # Make text red if the current path doesn't exist,

@@ -368,12 +368,20 @@ class MainWindow(QtWidgets.QMainWindow):
         # Set post properties to the GUI's fields' values,
         # NOT to be called directly
 
-        if (
-            self.internal_name_mismatch_confirmation()
-            and self.collection_mismatch_confirmation(
-                fumoedit.get_foldername(self.current_filepath)
+        if self.current_filepath:
+            # If the current post has been saved before,
+            # perform internal name and collection mismatch checks...
+            checks_successful = (
+                self.internal_name_mismatch_confirmation()
+                and self.collection_mismatch_confirmation(
+                    path.dirname(self.current_filepath)
+                )
             )
-        ):
+        else:
+            # ...otherwise, don't perform any checks and save right away
+            checks_successful = True
+
+        if checks_successful:
             self.current_post.id = self.LePostID.text()
 
             d_day = self.DePostDate.date().day()
@@ -424,7 +432,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 # shave off the directory name from the filepath
                 # (which would actually point to a folder)
                 folderpath = dialog.selectedFiles()[0]
-                if self.overwrite_confirmation(folderpath):
+                filepath = f"{folderpath}/{self.current_post.get_filename()}"
+                if self.overwrite_confirmation(filepath):
                     self.save_post_internal(folderpath)
 
     # Post methods

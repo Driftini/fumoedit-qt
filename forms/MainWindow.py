@@ -281,8 +281,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # Prevent manually zooming the post body preview,
         # font size can be set in the settings
         if (
-            event.modifiers() & (1 << Qt.KeyboardModifier.ControlModifier)
-        ) > 0:
+            event.modifiers() & Qt.KeyboardModifier.ControlModifier
+        ) != Qt.KeyboardModifier.ControlModifier:
             QtWidgets.QTextEdit.wheelEvent(self.TePostBodyPreview, event)
 
     def collection_to_display_name(self, collection_name):

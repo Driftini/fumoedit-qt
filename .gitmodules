@@ -1,3 +1,4 @@
 [submodule "fumoedit"]
 	path = fumoedit
 	url = https://github.com/Driftini/fumoedit
+	branch = v2

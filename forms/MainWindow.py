@@ -23,18 +23,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.current_post = None
         self.current_picture = None
-        self.current_variant = None
         self.set_current_filepath(None)
         self.dirty_file = False
-
-        self.LePostThumbName.path_part_1 = lambda: settings["site_path"]
-        self.LePostThumbName.path_part_2 = lambda: self.current_post.get_thumbnail_path()[1:]
-
-        self.LeThumbFilename.path_part_1 = lambda: settings["site_path"]
-        self.LeThumbFilename.path_part_2 = self.get_thumb_path_wrapper
-
-        self.LeVariantFilename.path_part_1 = lambda: settings["site_path"]
-        self.LeVariantFilename.path_part_2 = self.get_variant_path_wrapper
 
         self.new_post()
 
@@ -48,64 +38,37 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ActionQuit.triggered.connect(self.close)
 
         # Post editor widgets
-        self.LePostID.textEdited.connect(self.update_internal_name)
-        self.DePostDate.dateChanged.connect(self.update_internal_name)
-        self.CbPostCollection.currentTextChanged.connect(
+        self.LeID.textEdited.connect(self.update_internal_name)
+        self.DeDate.dateChanged.connect(self.update_internal_name)
+        self.CbCollection.currentTextChanged.connect(
             self.set_post_collection
         )
         # textEdited is sent before textChanged, which
         # is what FilenameEdit uses for checks
-        self.LePostThumbName.textEdited.connect(self.post_thumbnail_changed)
-        self.PtePostBody.textChanged.connect(self.update_post_preview)
-        self.TePostBodyPreview.wheelEvent = self.post_preview_wheeloverride
+        self.LeThumbName.textEdited.connect(self.post_thumbnail_changed)
+        self.PteBody.textChanged.connect(self.update_post_preview)
+        self.TeBodyPreview.wheelEvent = self.post_preview_wheeloverride
 
         # Picture manager widgets (pictures)
         self.TwPictures.itemSelectionChanged.connect(
             self.picture_selection_changed
         )
-        self.PbPictureNew.clicked.connect(self.add_picture)
+        self.PbPictureAddEdit.clicked.connect(self.add_picture)
         self.PbPictureDelete.clicked.connect(self.delete_picture)
-        self.LeThumbFilename.textEdited.connect(self.thumbnail_props_changed)
-        self.SbThumbX.valueChanged.connect(self.thumbnail_props_changed)
-        self.SbThumbY.valueChanged.connect(self.thumbnail_props_changed)
-        self.CbThumbCenterX.toggled.connect(self.thumbnail_props_changed)
-        self.CbThumbCenterY.toggled.connect(self.thumbnail_props_changed)
-
-        # Picture manager widgets (variants)
-        self.TwVariants.itemSelectionChanged.connect(
-            self.variant_selection_changed
-        )
-        self.LeVariantFilename.textEdited.connect(
-            self.variant_filename_changed
-        )
-        self.PbVariantNew.clicked.connect(self.add_variant)
-        self.PbVariantDelete.clicked.connect(self.delete_variant)
 
         # Dirty signaling (abhorrent)
-        self.LePostID.textEdited.connect(self.dirty)
-        self.DePostDate.dateChanged.connect(self.dirty)
-        self.CbPostCollection.currentTextChanged.connect(self.dirty)
-        self.LePostTitle.textEdited.connect(self.dirty)
-        self.LePostThumbName.textEdited.connect(self.dirty)
-        self.PtePostBody.textChanged.connect(self.dirty)
+        self.LeID.textEdited.connect(self.dirty)
+        self.DeDate.dateChanged.connect(self.dirty)
+        self.CbCollection.currentTextChanged.connect(self.dirty)
+        self.LeTitle.textEdited.connect(self.dirty)
+        self.LeThumbName.textEdited.connect(self.dirty)
+        self.PteBody.textChanged.connect(self.dirty)
 
-        self.TwPictures.itemSelectionChanged.connect(self.dirty)
-        self.PbPictureNew.clicked.connect(self.dirty)
+        self.PbPictureAddEdit.clicked.connect(self.dirty)
         self.PbPictureDelete.clicked.connect(self.dirty)
-        self.LeThumbFilename.textEdited.connect(self.dirty)
-        self.SbThumbX.valueChanged.connect(self.dirty)
-        self.SbThumbY.valueChanged.connect(self.dirty)
-        self.CbThumbCenterX.toggled.connect(self.dirty)
-        self.CbThumbCenterY.toggled.connect(self.dirty)
-
-        self.TwVariants.itemSelectionChanged.connect(self.dirty)
-        self.PbVariantNew.clicked.connect(self.dirty)
-        self.PbVariantDelete.clicked.connect(self.dirty)
-        self.LeVariantFilename.textEdited.connect(self.dirty)
-        self.LeVariantLabel.textEdited.connect(self.dirty)
 
     def post_thumbnail_changed(self):
-        self.current_post.thumbnail = self.LePostThumbName.text()
+        self.current_post.priority_thumbnail = self.LeThumbName.text()
 
     def picture_selection_changed(self):
         selected_rows = self.TwPictures.selectionModel().selectedRows()
@@ -119,20 +82,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def thumbnail_props_changed(self):
         if self.current_picture:
             self.update_thumbnail_preview()
-
-    def variant_selection_changed(self):
-        if self.current_picture:
-            selected_rows = self.TwVariants.selectionModel().selectedRows()
-
-            if len(selected_rows) > 0:
-                self.select_variant(
-                    self.current_picture.variants[selected_rows[0].row()])
-            else:
-                self.deselect_variant()
-
-    def variant_filename_changed(self):
-        if self.current_picture and self.current_variant:
-            self.current_variant.filename = self.LeVariantFilename.text()
 
     # Miscellaneous methods
     def dirty(self):
@@ -187,28 +136,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # Continue automatically if the filepath doesn't exist
         return True
 
-    def collection_mismatch_confirmation(self, collection):
-        # If there's a mismatch between the current post's collection
-        # and the folder it's being saved into, ask for
-        # confirmation before continuing
-        if (
-            self.current_post.get_collection() != collection
-            or self.current_picture.get_collection() != "_" + collection
-        ):
-            msgbox = QtWidgets.QMessageBox()
-            msgbox.setIcon(QtWidgets.QMessageBox.Warning)
-
-            reply = msgbox.question(
-                self, "Collection mismatch",
-                f"The selected folder doesn't match this post's collection.\nDo you want to save this post while discarding its current collection?",
-                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel,
-                QtWidgets.QMessageBox.Cancel
-            )
-
-            return reply == QtWidgets.QMessageBox.StandardButton.Yes
-        # Continue automatically if there's no collection mismatch
-        return True
-
     def internal_name_mismatch_confirmation(self):
         # If there's a mismatch between the current post's collection
         # and the folder it's being saved into, ask for
@@ -242,38 +169,32 @@ class MainWindow(QtWidgets.QMainWindow):
     def check_settings(self):
         # Read settings and configure widgets according to them
         if settings["wrap_body"]:
-            self.PtePostBody.setLineWrapMode(
+            self.PteBody.setLineWrapMode(
                 QtWidgets.QPlainTextEdit.LineWrapMode.WidgetWidth
             )
         else:
-            self.PtePostBody.setLineWrapMode(
+            self.PteBody.setLineWrapMode(
                 QtWidgets.QPlainTextEdit.LineWrapMode.NoWrap
             )
-        body_font = self.PtePostBody.font()
+        body_font = self.PteBody.font()
         body_font.setPointSize(settings["fontsize_body"])
-        self.PtePostBody.setFont(body_font)
+        self.PteBody.setFont(body_font)
 
         if settings["wrap_preview"]:
-            self.TePostBodyPreview.setLineWrapMode(
+            self.TeBodyPreview.setLineWrapMode(
                 QtWidgets.QTextEdit.LineWrapMode.WidgetWidth
             )
         else:
-            self.TePostBodyPreview.setLineWrapMode(
+            self.TeBodyPreview.setLineWrapMode(
                 QtWidgets.QTextEdit.LineWrapMode.NoWrap
             )
-        preview_font = self.TePostBodyPreview.font()
+        preview_font = self.TeBodyPreview.font()
         preview_font.setPointSize(settings["fontsize_preview"])
-        self.TePostBodyPreview.setFont(preview_font)
+        self.TeBodyPreview.setFont(preview_font)
 
     def get_thumb_path_wrapper(self):
         if self.current_picture:
             return self.current_picture.get_thumbnail_path()[1:]
-        else:
-            return ""
-
-    def get_variant_path_wrapper(self):
-        if self.current_picture and self.current_variant:
-            return self.current_variant.get_path()[1:]
         else:
             return ""
 
@@ -283,7 +204,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if (
             event.modifiers() & Qt.KeyboardModifier.ControlModifier
         ) != Qt.KeyboardModifier.ControlModifier:
-            QtWidgets.QTextEdit.wheelEvent(self.TePostBodyPreview, event)
+            QtWidgets.QTextEdit.wheelEvent(self.TeBodyPreview, event)
 
     def collection_to_display_name(self, collection_name):
         match collection_name:
@@ -370,23 +291,18 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.current_filepath:
             # If the current post has been saved before,
-            # perform internal name and collection mismatch checks...
-            checks_successful = (
-                self.internal_name_mismatch_confirmation()
-                and self.collection_mismatch_confirmation(
-                    path.dirname(self.current_filepath)
-                )
-            )
+            # perform internal name check...
+            check_successful = self.internal_name_mismatch_confirmation()
         else:
             # ...otherwise, don't perform any checks and save right away
-            checks_successful = True
+            check_successful = True
 
-        if checks_successful:
-            self.current_post.id = self.LePostID.text()
+        if check_successful:
+            self.current_post.id = self.LeID.text()
 
-            d_day = self.DePostDate.date().day()
-            d_month = self.DePostDate.date().month()
-            d_year = self.DePostDate.date().year()
+            d_day = self.DeDate.date().day()
+            d_month = self.DeDate.date().month()
+            d_year = self.DeDate.date().year()
             self.current_post.set_date(d_year, d_month, d_day)
 
             # Set filepath again, just in case
@@ -394,12 +310,9 @@ class MainWindow(QtWidgets.QMainWindow):
             fp = f"{folderpath}/{self.current_post.get_filename()}"
             self.set_current_filepath(fp)
 
-            self.current_post.title = self.LePostTitle.text()
-            self.current_post.thumbnail = self.LePostThumbName.text()
-            self.current_post.body = self.PtePostBody.toPlainText()
-
-            self.save_variant()
-            self.save_picture()
+            self.current_post.title = self.LeTitle.text()
+            self.current_post.priority_thumbnail = self.LeThumbName.text()
+            self.current_post.body = self.PteBody.toPlainText()
 
             fumoedit.post_to_file(
                 self.current_post,
@@ -446,38 +359,36 @@ class MainWindow(QtWidgets.QMainWindow):
             print(f"* Created new post at {currenttime()}")
 
     def load_post(self, post, filepath=None):
-        # Brings focus to the Post Editor and fills in every field
+        # Brings focus to the Body tab and fills in every field
         # of the GUI with the given post's properties
-        self.TwMain.setCurrentIndex(0)
+        self.TwEditors.setCurrentIndex(0)
 
         self.deselect_picture()
-        self.deselect_variant()
 
         self.current_post = post
         self.set_current_filepath(filepath)
 
-        self.LePostID.setText(self.current_post.id)
-        self.DePostDate.setDate(self.current_post.date)
-        self.LePostTitle.setText(self.current_post.title)
-        self.LePostThumbName.setText(self.current_post.thumbnail)
-        self.PtePostBody.setPlainText(self.current_post.body)
+        self.LeID.setText(self.current_post.id)
+        self.DeDate.setDate(self.current_post.date)
+        self.LeTitle.setText(self.current_post.title)
+        self.LeThumbName.setText(self.current_post.priority_thumbnail)
+        self.PteBody.setPlainText(self.current_post.body)
 
         self.update_internal_name()
-        self.update_pictures_table(True)
-        self.update_variants_table(True)
+        self.update_pictures_table()
 
-        self.CbPostCollection.setCurrentText(
+        self.CbCollection.setCurrentText(
             self.collection_to_display_name(self.current_post.get_collection())
         )
 
     def update_internal_name(self):
-        d_day = self.DePostDate.date().day()
-        d_month = self.DePostDate.date().month()
-        d_year = self.DePostDate.date().year()
+        d_day = self.DeDate.date().day()
+        d_month = self.DeDate.date().month()
+        d_year = self.DeDate.date().year()
         self.current_post.set_date(d_year, d_month, d_day)
-        self.current_post.id = self.LePostID.text()
+        self.current_post.id = self.LeID.text()
 
-        self.LePostInternalName.setText(self.current_post.get_internal_name())
+        self.LeInternalName.setText(self.current_post.get_internal_name())
 
     def set_post_collection(self, collection):
         # Set the current post's collection
@@ -488,38 +399,38 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Enable or disable the picture manager depending on whether or not
         # the current post is a picture post
-        self.TwMain.setTabEnabled(1, self.current_post.is_picturepost())
+        self.TwEditors.setTabEnabled(1, self.current_post.is_picturepost())
 
     def update_post_preview(self):
         # Update the Markdown preview of the post body, while retaining
         # the old scrollbar position unless autoscroll has been enabled.
-        old_scrollpos_x = self.TePostBodyPreview.horizontalScrollBar().value()
-        old_scrollpos_y = self.TePostBodyPreview.verticalScrollBar().value()
+        old_scrollpos_x = self.TeBodyPreview.horizontalScrollBar().value()
+        old_scrollpos_y = self.TeBodyPreview.verticalScrollBar().value()
 
-        self.TePostBodyPreview.setMarkdown(self.PtePostBody.toPlainText())
+        self.TeBodyPreview.setMarkdown(self.PteBody.toPlainText())
 
-        if self.CbPostPreviewAutoscroll.isChecked():
-            self.TePostBodyPreview.horizontalScrollBar().setValue(old_scrollpos_x)
-            self.TePostBodyPreview.verticalScrollBar().setValue(
-                self.TePostBodyPreview.maximumHeight()
+        if self.CbBodyPreviewAutoscroll.isChecked():
+            self.TeBodyPreview.horizontalScrollBar().setValue(old_scrollpos_x)
+            self.TeBodyPreview.verticalScrollBar().setValue(
+                self.TeBodyPreview.maximumHeight()
             )
         else:
-            self.TePostBodyPreview.horizontalScrollBar().setValue(old_scrollpos_x)
-            self.TePostBodyPreview.verticalScrollBar().setValue(old_scrollpos_y)
+            self.TeBodyPreview.horizontalScrollBar().setValue(old_scrollpos_x)
+            self.TeBodyPreview.verticalScrollBar().setValue(old_scrollpos_y)
 
     def validate_post(self):
         # Post validation conditions:
         # Has title, has ID, has body
         to_fill = []
 
-        if len(self.LePostTitle.text()) <= 0:
-            to_fill.append(self.LblPostTitle.text())
+        if len(self.LeTitle.text()) <= 0:
+            to_fill.append(self.LblTitle.text())
 
-        if len(self.LePostID.text()) <= 0:
-            to_fill.append(self.LblPostID.text())
+        if len(self.LeID.text()) <= 0:
+            to_fill.append(self.LblID.text())
 
-        if len(self.PtePostBody.toPlainText()) <= 0:
-            to_fill.append(self.LblPostBody.text())
+        if len(self.PteBody.toPlainText()) <= 0:
+            to_fill.append(self.LblBody.text())
 
         if len(to_fill) == 0:
             return True  # Validation successful
@@ -536,20 +447,17 @@ class MainWindow(QtWidgets.QMainWindow):
             return False  # Validation failed
 
     # Picture methods
-    def update_pictures_table(self, reset):
-        # If reset is on, the contents will be cleared and reinserted
-        # Else, only the visible values will change
-        if (reset):
-            self.TwPictures.clearContents()
-            self.TwPictures.setRowCount(len(self.current_post.pictures))
+    def update_pictures_table(self):
+        self.TwPictures.clearContents()
+        self.TwPictures.setRowCount(len(self.current_post.pictures))
 
         for i in range(0, len(self.current_post.pictures)):
             picture = self.current_post.pictures[i]
 
             self.TwPictures.setItem(
-                i, 0, QtWidgets.QTableWidgetItem(f"{len(picture.variants)}"))
+                i, 0, QtWidgets.QTableWidgetItem(picture.get_label()))
             self.TwPictures.setItem(
-                i, 1, QtWidgets.QTableWidgetItem(picture.thumbnail_name))
+                i, 1, QtWidgets.QTableWidgetItem(picture.original_filename))
 
     def update_thumbnail_preview(self):
         # Update the picture in the thumbnail preview box,
@@ -572,7 +480,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if path.exists(absolute):
                 pixmap = QtGui.QPixmap(absolute)
                 scene.addPixmap(pixmap)
-                self.GvThumbPreview.setScene(scene)
+                self.GvPicturePreview.setScene(scene)
 
                 # Prepare offsets
                 offset_x = 0
@@ -580,115 +488,34 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 if self.CbThumbCenterX.isChecked():
                     offset_x = pixmap.width() / 2
-                    offset_x -= self.GvThumbPreview.width() / 2
+                    offset_x -= self.GvPicturePreview.width() / 2
                 else:
                     offset_x = self.SbThumbX.cleanText()
 
                 if self.CbThumbCenterY.isChecked():
                     offset_y = pixmap.height() / 2
-                    offset_y -= self.GvThumbPreview.height() / 2
+                    offset_y -= self.GvPicturePreview.height() / 2
                 else:
                     offset_y = self.SbThumbY.cleanText()
 
                 # Apply offsets
-                self.GvThumbPreview.horizontalScrollBar().setValue(int(offset_x))
-                self.GvThumbPreview.verticalScrollBar().setValue(int(offset_y))
+                self.GvPicturePreview.horizontalScrollBar().setValue(int(offset_x))
+                self.GvPicturePreview.verticalScrollBar().setValue(int(offset_y))
 
                 return
 
         # This is only reached if the file doesn't exist
         # or if there's no selected picture
-        self.GvThumbPreview.setScene(scene)
-
-
+        self.GvPicturePreview.setScene(scene)
 
     def add_picture(self):
         # Add a new empty picture to the current post
-        self.current_post.new_picture()
+        # self.current_post.new_picture()
 
-        self.update_pictures_table(True)
-
-    def save_picture(self):
-        # Apply picture fields' values to the current picture
-        if self.current_picture:
-            self.current_picture.thumbnail_name = self.LeThumbFilename.text()
-
-            offset = [None, None]
-
-            if self.CbThumbCenterX.isChecked():
-                offset[0] = "center"
-            else:
-                offset[0] = -self.SbThumbX.value()
-
-            if self.CbThumbCenterY.isChecked():
-                offset[1] = "center"
-            else:
-                offset[1] = -self.SbThumbY.value()
-
-            self.current_picture.thumbnail_offset = offset
-
-            print(
-                f"* Saved picture {self.current_post.pictures.index(self.current_picture)} at {currenttime()}"
-            )
-            self.update_pictures_table(False)
-
-    def select_picture(self, picture):
-        # Set all picture fields' values to the given picture's,
-        # update variants table accordingly
-        # If there's already a loaded picture, save its edits beforehand
-        if self.current_picture:
-            self.deselect_variant()
-            self.save_picture()
-
-        self.current_picture = picture
-
-        self.LeThumbFilename.setText(self.current_picture.thumbnail_name)
-
-        center_x = self.current_picture.thumbnail_offset[0] == "center"
-        center_y = self.current_picture.thumbnail_offset[1] == "center"
-
-        if center_x:
-            self.CbThumbCenterX.setChecked(True)
-            self.SbThumbX.setValue(0)
-        else:
-            self.CbThumbCenterX.setChecked(False)
-            self.SbThumbX.setValue(-self.current_picture.thumbnail_offset[0])
-
-        if center_y:
-            self.CbThumbCenterY.setChecked(True)
-            self.SbThumbY.setValue(0)
-        else:
-            self.CbThumbCenterY.setChecked(False)
-            self.SbThumbY.setValue(-self.current_picture.thumbnail_offset[1])
-
-        self.update_variants_table(True)
-        self.TwVariants.setEnabled(True)
-        self.PbPictureDelete.setEnabled(True)
-        self.PbVariantNew.setEnabled(True)
-        self.GbPicMan2.setEnabled(True)
-        self.update_thumbnail_preview()
+        self.update_pictures_table()
 
     def deselect_picture(self):
-        # If there's already a loaded picture, save its edits beforehand
-        if self.current_picture:
-            self.deselect_variant()
-            self.save_picture()
-
-        # Disable all picture and variant fields
-        self.current_picture = None
-
-        self.LeThumbFilename.clear()
-        self.SbThumbX.setValue(0)
-        self.SbThumbY.setValue(0)
-        self.CbThumbCenterX.setChecked(False)
-        self.CbThumbCenterY.setChecked(False)
         self.update_thumbnail_preview()
-
-        self.update_variants_table(True)
-        self.TwVariants.setEnabled(False)
-        self.PbPictureDelete.setEnabled(False)
-        self.PbVariantNew.setEnabled(False)
-        self.GbPicMan2.setEnabled(False)
 
     def delete_picture(self):
         # Delete the selected picture from the current post
@@ -696,85 +523,4 @@ class MainWindow(QtWidgets.QMainWindow):
             self.current_post.pictures.remove(self.current_picture)
             self.current_picture = None  # to prevent saving when deselecting the picture
 
-        self.update_pictures_table(True)
-
-    def validate_picture(self):
-        # TODO
-        return True
-
-    # Picture variant methods
-    def update_variants_table(self, reset):
-        # If reset is on, the contents will be cleared and reinserted
-        # Else, only the visible values will change
-        if self.current_picture:
-            if (reset):
-                self.TwVariants.clearContents()
-                self.TwVariants.setRowCount(len(self.current_picture.variants))
-
-            for i in range(0, len(self.current_picture.variants)):
-                variant = self.current_picture.variants[i]
-
-                self.TwVariants.setItem(
-                    i, 0, QtWidgets.QTableWidgetItem(variant.label))
-                self.TwVariants.setItem(
-                    i, 1, QtWidgets.QTableWidgetItem(variant.filename))
-
-    def add_variant(self):
-        # Add a new empty variant to the current picture
-        if self.current_picture:
-            self.current_picture.new_variant()
-            self.update_variants_table(True)
-
-    def save_variant(self):
-        # Apply variant fields' values to the current variant
-        if self.current_picture and self.current_variant:
-            self.current_variant.filename = self.LeVariantFilename.text()
-            self.current_variant.label = self.LeVariantLabel.text()
-
-            print(
-                f"* Saved variant {self.current_variant.get_label()} at {currenttime()}"
-            )
-            self.update_variants_table(False)
-
-    def select_variant(self, variant):
-        # Set all variant fields' values to the selected variant's
-        # If there's already a loaded variant, save its edits beforehand
-        if self.current_picture:
-            if self.current_variant:
-                self.save_variant()
-
-            self.current_variant = variant
-
-            self.PbVariantDelete.setEnabled(True)
-            self.LeVariantFilename.setEnabled(True)
-            self.LeVariantLabel.setEnabled(True)
-
-            self.LeVariantFilename.setText(self.current_variant.filename)
-            self.LeVariantLabel.setText(self.current_variant.label)
-
-            self.GbPicMan3.setEnabled(True)
-
-    def deselect_variant(self):
-        # If there's already a loaded variant, save its edits beforehand
-        if self.current_variant:
-            self.save_variant()
-
-        # Clear and disable all variant fields
-        self.current_variant = None
-
-        self.PbVariantDelete.setEnabled(False)
-        self.LeVariantFilename.setEnabled(False)
-        self.LeVariantLabel.setEnabled(False)
-
-        self.LeVariantFilename.clear()
-        self.LeVariantLabel.clear()
-
-    def delete_variant(self):
-        # Delete the selected variant from the current picture
-        if self.current_picture and self.current_variant:
-            self.current_picture.variants.remove(self.current_variant)
-            self.update_variants_table(True)
-
-    def validate_variant(self):
-        # TODO
-        return True
+        self.update_pictures_table()

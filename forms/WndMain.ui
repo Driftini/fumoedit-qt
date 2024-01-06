@@ -45,7 +45,7 @@
      </widget>
     </item>
     <item row="2" column="1">
-     <widget class="QLineEdit" name="lineEdit"/>
+     <widget class="QLineEdit" name="LeTags"/>
     </item>
     <item row="1" column="4">
      <widget class="QComboBox" name="CbCollection">
@@ -90,7 +90,7 @@
      <widget class="FilenameEdit" name="LeThumbName"/>
     </item>
     <item row="2" column="0">
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="LblTags">
       <property name="text">
        <string>Tags:</string>
       </property>
@@ -139,7 +139,7 @@
     <item row="3" column="0" colspan="8">
      <widget class="QTabWidget" name="TwEditors">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="TabBody">
        <attribute name="title">
@@ -201,41 +201,7 @@
         <string>Pictures</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="1">
-         <widget class="QGraphicsView" name="GvPicturePreview">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>240</width>
-            <height>180</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>240</width>
-            <height>180</height>
-           </size>
-          </property>
-          <property name="verticalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
-          </property>
-          <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
-          </property>
-          <property name="transformationAnchor">
-           <enum>QGraphicsView::NoAnchor</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" rowspan="4">
+        <item row="0" column="0" rowspan="5">
          <widget class="QTableWidget" name="TwPictures">
           <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
@@ -271,16 +237,57 @@
          </widget>
         </item>
         <item row="3" column="1">
+         <widget class="QPushButton" name="PbPictureEdit">
+          <property name="text">
+           <string>Edit...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
          <widget class="QPushButton" name="PbPictureDelete">
           <property name="text">
            <string>Delete</string>
           </property>
          </widget>
         </item>
+        <item row="0" column="1">
+         <widget class="QGraphicsView" name="GvPicturePreview">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>240</width>
+            <height>180</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>240</width>
+            <height>180</height>
+           </size>
+          </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="transformationAnchor">
+           <enum>QGraphicsView::NoAnchor</enum>
+          </property>
+         </widget>
+        </item>
         <item row="2" column="1">
-         <widget class="QPushButton" name="PbPictureAddEdit">
+         <widget class="QPushButton" name="PbPictureAdd">
           <property name="text">
-           <string>Add/Edit...</string>
+           <string>Add...</string>
           </property>
          </widget>
         </item>
@@ -289,7 +296,7 @@
      </widget>
     </item>
     <item row="2" column="2">
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="PbKnownTags">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
         <horstretch>0</horstretch>
@@ -409,7 +416,7 @@
   <tabstop>CbBodyPreviewAutoscroll</tabstop>
   <tabstop>TwPictures</tabstop>
   <tabstop>GvPicturePreview</tabstop>
-  <tabstop>PbPictureAddEdit</tabstop>
+  <tabstop>PbPictureEdit</tabstop>
   <tabstop>PbPictureDelete</tabstop>
  </tabstops>
  <resources/>

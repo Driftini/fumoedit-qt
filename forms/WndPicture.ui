@@ -34,7 +34,7 @@
     </widget>
    </item>
    <item row="0" column="1" colspan="2">
-    <widget class="FilenameEdit" name="LeLabel"/>
+    <widget class="QLineEdit" name="LeLabel"/>
    </item>
    <item row="2" column="0">
     <widget class="QLabel" name="LblThumbFilename">
@@ -142,6 +142,14 @@
    <header>widgets.FilenameEdit</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>LeLabel</tabstop>
+  <tabstop>LeOriginalFilename</tabstop>
+  <tabstop>LeThumbFilename</tabstop>
+  <tabstop>SbThumbPos</tabstop>
+  <tabstop>CbThumbCenter</tabstop>
+  <tabstop>GvThumbPreview</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

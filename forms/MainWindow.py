@@ -1,5 +1,7 @@
+from copy import deepcopy
 from datetime import date
 from forms.SettingsWindow import SettingsWindow
+from forms.PictureWindow import PictureWindow
 import fumoedit
 from os import path
 from PyQt5 import QtGui, QtWidgets, uic
@@ -53,7 +55,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.TwPictures.itemSelectionChanged.connect(
             self.picture_selection_changed
         )
-        self.PbPictureAddEdit.clicked.connect(self.add_picture)
+        self.PbPictureAdd.clicked.connect(self.add_picture)
+        self.PbPictureEdit.clicked.connect(self.open_picture)
         self.PbPictureDelete.clicked.connect(self.delete_picture)
 
         # Dirty signaling (abhorrent)
@@ -64,26 +67,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LeThumbName.textEdited.connect(self.dirty)
         self.PteBody.textChanged.connect(self.dirty)
 
-        self.PbPictureAddEdit.clicked.connect(self.dirty)
+        self.PbPictureAdd.clicked.connect(self.dirty)
+        self.PbPictureEdit.clicked.connect(self.dirty)
         self.PbPictureDelete.clicked.connect(self.dirty)
 
-    def post_thumbnail_changed(self):
-        self.current_post.priority_thumbnail = self.LeThumbName.text()
-
-    def picture_selection_changed(self):
-        selected_rows = self.TwPictures.selectionModel().selectedRows()
-
-        if len(selected_rows) > 0:
-            self.select_picture(
-                self.current_post.pictures[selected_rows[0].row()])
-        else:
-            self.deselect_picture()
-
-    def thumbnail_props_changed(self):
-        if self.current_picture:
-            self.update_thumbnail_preview()
-
-    # Miscellaneous methods
+    # Dirty file signaling
     def dirty(self):
         # Tag current post as dirty, update window title to reflect so
         if not self.dirty_file:
@@ -100,6 +88,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.dirty_file = False
 
+    # Close confirmations
     def discard_confirmation(self):
         # If the current file is dirty, ask for
         # confirmation before continuing
@@ -161,6 +150,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # or if the post is being saved for the first time
         return True
 
+    # Settings-related methods
     def show_settings(self):
         dialog = SettingsWindow(self)
         if dialog.exec():
@@ -193,19 +183,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.TeBodyPreview.setFont(preview_font)
 
     def get_thumb_path_wrapper(self):
-        if self.current_picture:
-            return self.current_picture.get_thumbnail_path()[1:]
+        selection_index = self.get_selected_pictureindex()
+
+        if selection_index >= 0:
+            return self.current_post.pictures[selection_index].get_thumbnail_path()[1:]
         else:
             return ""
 
-    def post_preview_wheeloverride(self, event):
-        # Prevent manually zooming the post body preview,
-        # font size can be set in the settings
-        if (
-            event.modifiers() & Qt.KeyboardModifier.ControlModifier
-        ) != Qt.KeyboardModifier.ControlModifier:
-            QtWidgets.QTextEdit.wheelEvent(self.TeBodyPreview, event)
-
+    # Collection name conversions
     def collection_to_display_name(self, collection_name):
         match collection_name:
             case "posts":
@@ -224,6 +209,7 @@ class MainWindow(QtWidgets.QMainWindow):
             case _:
                 return display_name.lower()
 
+    # Misc. event overrides
     def closeEvent(self, event):
         # Override for the window's close event, prompts the user
         # for confirmation if there are unsaved changes
@@ -363,8 +349,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # of the GUI with the given post's properties
         self.TwEditors.setCurrentIndex(0)
 
-        self.deselect_picture()
-
         self.current_post = post
         self.set_current_filepath(filepath)
 
@@ -375,7 +359,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.PteBody.setPlainText(self.current_post.body)
 
         self.update_internal_name()
-        self.update_pictures_table()
+        self.update_pictures_table(True)
+        self.picture_selection_changed() # to update buttons' status
 
         self.CbCollection.setCurrentText(
             self.collection_to_display_name(self.current_post.get_collection())
@@ -418,6 +403,17 @@ class MainWindow(QtWidgets.QMainWindow):
             self.TeBodyPreview.horizontalScrollBar().setValue(old_scrollpos_x)
             self.TeBodyPreview.verticalScrollBar().setValue(old_scrollpos_y)
 
+    def post_preview_wheeloverride(self, event):
+        # Prevent manually zooming the post body preview,
+        # font size can be set in the settings
+        if (
+            event.modifiers() & Qt.KeyboardModifier.ControlModifier
+        ) != Qt.KeyboardModifier.ControlModifier:
+            QtWidgets.QTextEdit.wheelEvent(self.TeBodyPreview, event)
+
+    def post_thumbnail_changed(self):
+        self.current_post.priority_thumbnail = self.LeThumbName.text()
+
     def validate_post(self):
         # Post validation conditions:
         # Has title, has ID, has body
@@ -447,17 +443,38 @@ class MainWindow(QtWidgets.QMainWindow):
             return False  # Validation failed
 
     # Picture methods
-    def update_pictures_table(self):
-        self.TwPictures.clearContents()
-        self.TwPictures.setRowCount(len(self.current_post.pictures))
+    def update_pictures_table(self, reset):
+        # If reset is on, the contents will be cleared and reinserted
+        # Else, only the visible values will change (so selection isn't lost)
+        if (reset):
+            self.TwPictures.clearContents()
+            self.TwPictures.setRowCount(len(self.current_post.pictures))
 
         for i in range(0, len(self.current_post.pictures)):
             picture = self.current_post.pictures[i]
 
             self.TwPictures.setItem(
-                i, 0, QtWidgets.QTableWidgetItem(picture.get_label()))
+                i, 0, QtWidgets.QTableWidgetItem(picture.label))
             self.TwPictures.setItem(
                 i, 1, QtWidgets.QTableWidgetItem(picture.original_filename))
+
+    def get_selected_pictureindex(self):
+        selected_rows = self.TwPictures.selectionModel().selectedRows()
+
+        if len(selected_rows) > 0:
+            return selected_rows[0].row()
+        else:
+            return -1
+
+    def picture_selection_changed(self):
+        if self.get_selected_pictureindex() >= 0:
+            self.PbPictureEdit.setDisabled(False)
+            self.PbPictureDelete.setDisabled(False)
+        else:
+            self.PbPictureEdit.setDisabled(True)
+            self.PbPictureDelete.setDisabled(True)
+
+        self.update_thumbnail_preview()
 
     def update_thumbnail_preview(self):
         # Update the picture in the thumbnail preview box,
@@ -466,13 +483,13 @@ class MainWindow(QtWidgets.QMainWindow):
         # I don't think I should instance a new scene every time
         scene = QtWidgets.QGraphicsScene()
 
-        if self.current_picture:
-            # Saving the pic outside of save method is painful
-            self.current_picture.thumbnail_name = self.LeThumbFilename.text()
+        selected_index = self.get_selected_pictureindex()
+        if selected_index >= 0:
+            selected_picture = self.current_post.pictures[selected_index]
 
             actual_path = path.join(
                 settings["site_path"],
-                self.current_picture.get_thumbnail_path()[1:]
+                selected_picture.get_thumbnail_path()[1:]
             )
             absolute = path.abspath(actual_path)
 
@@ -489,14 +506,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 if self.CbThumbCenterX.isChecked():
                     offset_x = pixmap.width() / 2
                     offset_x -= self.GvPicturePreview.width() / 2
-                else:
-                    offset_x = self.SbThumbX.cleanText()
 
                 if self.CbThumbCenterY.isChecked():
                     offset_y = pixmap.height() / 2
                     offset_y -= self.GvPicturePreview.height() / 2
                 else:
-                    offset_y = self.SbThumbY.cleanText()
+                    offset_y = self.SbThumbY.cleanText() # TODO INSERT PERCENTAGE
 
                 # Apply offsets
                 self.GvPicturePreview.horizontalScrollBar().setValue(int(offset_x))
@@ -509,18 +524,31 @@ class MainWindow(QtWidgets.QMainWindow):
         self.GvPicturePreview.setScene(scene)
 
     def add_picture(self):
-        # Add a new empty picture to the current post
-        # self.current_post.new_picture()
+        # Add a new picture to the current post through the Picture Editor
+        temp = deepcopy(self.current_post)
 
-        self.update_pictures_table()
+        dialog = PictureWindow(self)
+        dialog.picture = temp.new_picture()
+        dialog.load_picture() # eugh
+        if dialog.exec() and dialog.result():
+            self.current_post = temp
+            self.update_pictures_table(True)
 
-    def deselect_picture(self):
-        self.update_thumbnail_preview()
+    def open_picture(self):
+        # Open the selected picture from the current post through the Picture Editor
+        selected_index = self.get_selected_pictureindex()
+        temp = deepcopy(self.current_post.pictures[selected_index])
+
+        dialog = PictureWindow(self)
+        dialog.picture = temp
+        dialog.load_picture() # eugh
+        if dialog.exec() and dialog.result():
+            self.current_post.pictures[selected_index] = temp
+            self.update_pictures_table(False)
 
     def delete_picture(self):
         # Delete the selected picture from the current post
-        if self.current_picture:
-            self.current_post.pictures.remove(self.current_picture)
-            self.current_picture = None  # to prevent saving when deselecting the picture
-
-        self.update_pictures_table()
+        selected_index = self.get_selected_pictureindex()
+        
+        del self.current_post.pictures[selected_index]
+        self.update_pictures_table(True)

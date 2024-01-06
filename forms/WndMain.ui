@@ -139,25 +139,13 @@
     <item row="3" column="0" colspan="8">
      <widget class="QTabWidget" name="TwEditors">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="TabBody">
        <attribute name="title">
         <string>Body</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
-        <property name="leftMargin">
-         <number>3</number>
-        </property>
-        <property name="topMargin">
-         <number>3</number>
-        </property>
-        <property name="rightMargin">
-         <number>3</number>
-        </property>
-        <property name="bottomMargin">
-         <number>3</number>
-        </property>
         <property name="spacing">
          <number>2</number>
         </property>
@@ -331,7 +319,7 @@
      <x>0</x>
      <y>0</y>
      <width>921</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="MenuFile">

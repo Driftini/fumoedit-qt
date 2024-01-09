@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>921</width>
-    <height>563</height>
+    <height>605</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -251,7 +251,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QGraphicsView" name="GvPicturePreview">
+         <widget class="ThumbnailPreview" name="GvPicturePreview">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -326,7 +326,7 @@
      <x>0</x>
      <y>0</y>
      <width>921</width>
-     <height>21</height>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="MenuFile">
@@ -401,6 +401,11 @@
    <class>FilenameEdit</class>
    <extends>QLineEdit</extends>
    <header>widgets.FilenameEdit</header>
+  </customwidget>
+  <customwidget>
+   <class>ThumbnailPreview</class>
+   <extends>QGraphicsView</extends>
+   <header>widgets.ThumbnailPreview</header>
   </customwidget>
  </customwidgets>
  <tabstops>

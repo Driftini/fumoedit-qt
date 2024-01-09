@@ -30,6 +30,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.new_post()
 
+        self.TwEditors.setCurrentIndex(1)
+
     def connect_signals(self):
         # Actions
         self.ActionNewPost.triggered.connect(self.new_post)
@@ -454,9 +456,11 @@ class MainWindow(QtWidgets.QMainWindow):
             picture = self.current_post.pictures[i]
 
             self.TwPictures.setItem(
-                i, 0, QtWidgets.QTableWidgetItem(picture.label))
+                i, 0, QtWidgets.QTableWidgetItem(picture.get_label()))
             self.TwPictures.setItem(
                 i, 1, QtWidgets.QTableWidgetItem(picture.original_filename))
+
+        self.update_thumbnail_preview()
 
     def get_selected_pictureindex(self):
         selected_rows = self.TwPictures.selectionModel().selectedRows()
@@ -477,51 +481,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.update_thumbnail_preview()
 
     def update_thumbnail_preview(self):
-        # Update the picture in the thumbnail preview box,
-        # while applying offsets from the relevant fields
-
-        # I don't think I should instance a new scene every time
-        scene = QtWidgets.QGraphicsScene()
+        path = ""
+        offset_percent = 0
 
         selected_index = self.get_selected_pictureindex()
         if selected_index >= 0:
-            selected_picture = self.current_post.pictures[selected_index]
+            picture = self.current_post.pictures[selected_index]
 
-            actual_path = path.join(
-                settings["site_path"],
-                selected_picture.get_thumbnail_path()[1:]
-            )
-            absolute = path.abspath(actual_path)
+            path = picture.get_thumbnail_path()
+            offset_percent = int(picture.thumbnail_offset)
 
-            # If the file exists...
-            if path.exists(absolute):
-                pixmap = QtGui.QPixmap(absolute)
-                scene.addPixmap(pixmap)
-                self.GvPicturePreview.setScene(scene)
-
-                # Prepare offsets
-                offset_x = 0
-                offset_y = 0
-
-                if self.CbThumbCenterX.isChecked():
-                    offset_x = pixmap.width() / 2
-                    offset_x -= self.GvPicturePreview.width() / 2
-
-                if self.CbThumbCenterY.isChecked():
-                    offset_y = pixmap.height() / 2
-                    offset_y -= self.GvPicturePreview.height() / 2
-                else:
-                    offset_y = self.SbThumbY.cleanText() # TODO INSERT PERCENTAGE
-
-                # Apply offsets
-                self.GvPicturePreview.horizontalScrollBar().setValue(int(offset_x))
-                self.GvPicturePreview.verticalScrollBar().setValue(int(offset_y))
-
-                return
-
-        # This is only reached if the file doesn't exist
-        # or if there's no selected picture
-        self.GvPicturePreview.setScene(scene)
+        self.GvPicturePreview.update_preview(path, offset_percent)
 
     def add_picture(self):
         # Add a new picture to the current post through the Picture Editor
@@ -529,7 +499,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         dialog = PictureWindow(self)
         dialog.picture = temp.new_picture()
-        dialog.load_picture() # eugh
+        dialog.load_picture()  # eugh
         if dialog.exec() and dialog.result():
             self.current_post = temp
             self.update_pictures_table(True)
@@ -541,7 +511,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         dialog = PictureWindow(self)
         dialog.picture = temp
-        dialog.load_picture() # eugh
+        dialog.load_picture()  # eugh
         if dialog.exec() and dialog.result():
             self.current_post.pictures[selected_index] = temp
             self.update_pictures_table(False)

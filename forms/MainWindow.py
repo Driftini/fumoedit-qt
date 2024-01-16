@@ -67,6 +67,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.CbCollection.currentTextChanged.connect(self.dirty)
         self.LeTitle.textEdited.connect(self.dirty)
         self.LeThumbName.textEdited.connect(self.dirty)
+        self.LeTags.textEdited.connect(self.dirty)
         self.PteBody.textChanged.connect(self.dirty)
 
         self.PbPictureAdd.clicked.connect(self.dirty)
@@ -302,6 +303,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.current_post.priority_thumbnail = self.LeThumbName.text()
             self.current_post.body = self.PteBody.toPlainText()
 
+            self.save_tags()
+
             fumoedit.post_to_file(
                 self.current_post,
                 path.dirname(self.current_filepath)
@@ -358,11 +361,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.DeDate.setDate(self.current_post.date)
         self.LeTitle.setText(self.current_post.title)
         self.LeThumbName.setText(self.current_post.priority_thumbnail)
+        self.load_tags()
         self.PteBody.setPlainText(self.current_post.body)
 
         self.update_internal_name()
         self.update_pictures_table(True)
-        self.picture_selection_changed() # to update buttons' status
+        self.picture_selection_changed()  # to update buttons' status
 
         self.CbCollection.setCurrentText(
             self.collection_to_display_name(self.current_post.get_collection())
@@ -418,7 +422,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def validate_post(self):
         # Post validation conditions:
-        # Has title, has ID, has body
+        # Has title, has ID, has body, tags don't start/end with comma (TODO)
         to_fill = []
 
         if len(self.LeTitle.text()) <= 0:
@@ -443,6 +447,29 @@ class MainWindow(QtWidgets.QMainWindow):
             )
 
             return False  # Validation failed
+
+    # Tag methods
+    def load_tags(self):
+        # Fill out the tags field with the post's tags, comma-separated
+        content = ""
+
+        for t in self.current_post.tags:
+            if self.current_post.tags.index(t) != 0:
+                content += ", "
+            content += t
+
+        self.LeTags.setText(content)
+
+    def save_tags(self):
+        # Divide the content of the tags field into individual tags
+        # and save them to the current post
+        tags = self.LeTags.text().split(",")
+
+        for t in tags:
+            i = tags.index(t)
+            tags[i] = t.strip()
+
+        self.current_post.tags = tags
 
     # Picture methods
     def update_pictures_table(self, reset):
@@ -519,6 +546,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def delete_picture(self):
         # Delete the selected picture from the current post
         selected_index = self.get_selected_pictureindex()
-        
+
         del self.current_post.pictures[selected_index]
         self.update_pictures_table(True)

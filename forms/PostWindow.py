@@ -18,7 +18,7 @@ def currenttime():
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi("forms/WndMain.ui", self)
+        uic.loadUi("forms/WndPost.ui", self)
         self.connect_signals()
 
         self.check_settings()

@@ -15,7 +15,7 @@ def currenttime():
     return time.strftime('%H:%M:%S', time.localtime())
 
 
-class MainWindow(QtWidgets.QMainWindow):
+class PostWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         uic.loadUi("forms/WndPost.ui", self)

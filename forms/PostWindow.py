@@ -129,9 +129,8 @@ class PostWindow(QtWidgets.QMainWindow):
         return True
 
     def internal_name_mismatch_confirmation(self):
-        # If there's a mismatch between the current post's collection
-        # and the folder it's being saved into, ask for
-        # confirmation before continuing
+        # If there's a mismatch between the old and current internal name,
+        # ask for confirmation before continuing
         if self.current_filepath:
             i_n = self.current_post.get_internal_name()
             last_i_n = path.basename(self.current_filepath)[:-3]
@@ -192,25 +191,6 @@ class PostWindow(QtWidgets.QMainWindow):
             return self.current_post.pictures[selection_index].get_thumbnail_path()[1:]
         else:
             return ""
-
-    # Collection name conversions
-    def collection_to_display_name(self, collection_name):
-        match collection_name:
-            case "posts":
-                return "Blog"
-            case "walls":
-                return "Wallpapers"
-            case _:
-                return collection_name.capitalize()
-
-    def display_to_collection_name(self, display_name):
-        match display_name:
-            case "Blog":
-                return "posts"
-            case "Wallpapers":
-                return "walls"
-            case _:
-                return display_name.lower()
 
     # Misc. event overrides
     def closeEvent(self, event):
@@ -344,8 +324,7 @@ class PostWindow(QtWidgets.QMainWindow):
     def new_post(self):
         # Load a blank post in the Blog collection
         if self.discard_confirmation():
-            self.load_post(fumoedit.Post())
-            self.set_post_collection("Blog")
+            self.load_post(fumoedit.Post(fumoedit.COLLECTIONS["posts"]))
             self.undirty()
             print(f"* Created new post at {currenttime()}")
 
@@ -368,9 +347,7 @@ class PostWindow(QtWidgets.QMainWindow):
         self.update_pictures_table(True)
         self.picture_selection_changed()  # to update buttons' status
 
-        self.CbCollection.setCurrentText(
-            self.collection_to_display_name(self.current_post.get_collection())
-        )
+        self.CbCollection.setCurrentText(self.current_post.collection.label)
 
     def update_internal_name(self):
         d_day = self.DeDate.date().day()
@@ -381,12 +358,18 @@ class PostWindow(QtWidgets.QMainWindow):
 
         self.LeInternalName.setText(self.current_post.get_internal_name())
 
-    def set_post_collection(self, collection):
+    def set_post_collection(self, label):
         # Set the current post's collection
         # using the latters' "pretty names"
-        self.current_post.set_collection(
-            self.display_to_collection_name(collection)
-        )
+        id = ""
+
+        match label:
+            case "Blog":
+                id = "posts"
+            case "Artwork":
+                id = "artwork"
+
+        self.current_post.collection = fumoedit.COLLECTIONS[id]
 
         # Enable or disable the picture manager depending on whether or not
         # the current post is a picture post
@@ -477,15 +460,14 @@ class PostWindow(QtWidgets.QMainWindow):
         # Else, only the visible values will change (so selection isn't lost)
         if (reset):
             self.TwPictures.clearContents()
-            self.TwPictures.setRowCount(len(self.current_post.pictures))
 
-        for i in range(0, len(self.current_post.pictures)):
-            picture = self.current_post.pictures[i]
+        for p in self.current_post.pictures:
+            self.TwPictures.insertRow(self.TwPictures.rowCount())
 
             self.TwPictures.setItem(
-                i, 0, QtWidgets.QTableWidgetItem(picture.get_label()))
+                i, 0, QtWidgets.QTableWidgetItem(p.get_label()))
             self.TwPictures.setItem(
-                i, 1, QtWidgets.QTableWidgetItem(picture.original_filename))
+                i, 1, QtWidgets.QTableWidgetItem(p.original_filename))
 
         self.update_thumbnail_preview()
 

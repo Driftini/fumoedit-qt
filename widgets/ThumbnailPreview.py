@@ -8,6 +8,8 @@ class ThumbnailPreview(QtWidgets.QGraphicsView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # self.setStyleSheet("ThumbnailPreview:focus { border: 5px solid #f83 }")
+
     def update_preview(self, picture_path, offset_percent):
         # Update the picture shown,
         # while scaling and applying the vertical offset

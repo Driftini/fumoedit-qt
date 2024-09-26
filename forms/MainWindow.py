@@ -20,10 +20,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def connect_signals(self):
         self.ActionSettings.triggered.connect(self.show_settings)
-        self.TwCollections.currentChanged.connect(self.clear_selection)
+
         self.PbRefresh.clicked.connect(self.load_collections)
-        self.TwBlogPosts.clicked.connect(self.blog_shiftclick_check)
-        self.TwArtPosts.clicked.connect(self.art_shiftclick_check)
+
+        self.TwCollections.currentChanged.connect(self.clear_selection)
+        self.TwBlogPosts.itemSelectionChanged.connect(self.blog_clicked)
+        self.TwArtPosts.itemSelectionChanged.connect(self.art_clicked)
+
+        self.PbSelectionClear.clicked.connect(self.clear_selection)
+        self.PbTagsAdd.clicked.connect(self.add_tags)
+        self.PbTagsRemove.clicked.connect(self.remove_tags)
 
     def show_settings(self):
         dialog = SettingsWindow(self)
@@ -31,22 +37,44 @@ class MainWindow(QtWidgets.QMainWindow):
         #     self.check_settings()
 
     # Events
-    def blog_shiftclick_check(self):
+    def blog_clicked(self):
+        # Get selected post in the TableWidget
+        row = self.TwBlogPosts.selectedIndexes()[0].row()
+        post = self.TwBlogPosts.item(row, 0).referenced_post
+
+        # Update info panel
+        date_str = post.date.strftime('%d %B %Y')
+
+        self.LblBlogInfoTitle.setText(post.title)
+        self.LblBlogInfoDate.setText(date_str)
+        self.LblBlogInfoTags.setText(post.get_tags())
+
+        if post.has_thumbnail():
+            self.GvPicturePreview.update_preview(post.get_thumbnail())
+        else:
+            self.GvPicturePreview.update_preview("")
+
         # Toggles blog post selection when shift-clicking
         if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:
-            # Get selected post in the TableWidget
-            row = self.TwBlogPosts.selectedIndexes()[0].row()
-            post = self.TwBlogPosts.item(row, 0).referenced_post
-
             self.toggle_selection(post)
 
-    def art_shiftclick_check(self):
-        # Toggles art post selection when shift-clicking
-        if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:
-            # Get selected post in the TableWidget
-            row = self.TwArtPosts.selectedIndexes()[0].row()
-            post = self.TwArtPosts.item(row, 0).referenced_post
+    def art_clicked(self):
+        # Get selected post in the TableWidget
+        row = self.TwArtPosts.selectedIndexes()[0].row()
+        post = self.TwArtPosts.item(row, 0).referenced_post
 
+        # Update info panel
+        date_str = post.date.strftime('%d %B %Y')
+
+        self.LblArtInfoTitle.setText(post.title)
+        self.LblArtInfoDate.setText(date_str)
+        self.LblArtInfoTags.setText(post.get_tags())
+
+        path, offset = post.get_thumbnail_withoffset()
+        self.GvArtSelectionPreview.update_preview(path, offset)
+
+        # Toggles blog post selection when shift-clicking
+        if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:
             self.toggle_selection(post)
 
     # Collection loading
@@ -59,7 +87,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 for filename in sorted(listdir(post_dir), reverse=True):
                     filepath = f"{post_dir}/{filename}"
-                    posts.append(fumoedit.post_from_file(filepath))
+
+                    if filename[-3:] == ".md":
+                        try:
+                            posts.append(fumoedit.post_from_file(filepath))
+                        except e:
+                            print(e)
 
                 match c:
                     case "posts":

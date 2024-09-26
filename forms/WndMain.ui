@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0,1">
     <item row="1" column="0">
-     <widget class="QPushButton" name="PbArtAdd">
+     <widget class="QPushButton" name="PbAdd">
       <property name="text">
        <string>Add...</string>
       </property>
@@ -30,14 +30,14 @@
      </widget>
     </item>
     <item row="1" column="2">
-     <widget class="QPushButton" name="PbArtDelete">
+     <widget class="QPushButton" name="PbDelete">
       <property name="text">
        <string>Delete</string>
       </property>
      </widget>
     </item>
     <item row="1" column="1">
-     <widget class="QPushButton" name="PbArtEdit">
+     <widget class="QPushButton" name="PbEdit">
       <property name="text">
        <string>Edit...</string>
       </property>
@@ -130,7 +130,7 @@
     <item row="0" column="0" colspan="3">
      <widget class="QTabWidget" name="TwCollections">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="TabBlog">
        <attribute name="title">
@@ -205,6 +205,9 @@
         </item>
         <item row="1" column="1" rowspan="2">
          <layout class="QFormLayout" name="FlBlogInfo">
+          <property name="labelAlignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
           <item row="0" column="0">
            <widget class="QLabel" name="LblBlogInfoLabelTitle">
             <property name="font">
@@ -216,6 +219,9 @@
             <property name="text">
              <string>Title:</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+            </property>
            </widget>
           </item>
           <item row="0" column="1">
@@ -224,7 +230,7 @@
              <string>[title]</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -242,6 +248,9 @@
             <property name="text">
              <string>Date:</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+            </property>
            </widget>
           </item>
           <item row="1" column="1">
@@ -250,7 +259,7 @@
              <string>[date]</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -268,6 +277,9 @@
             <property name="text">
              <string>Tags:</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+            </property>
            </widget>
           </item>
           <item row="2" column="1">
@@ -276,7 +288,7 @@
              <string>[tags]</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -328,6 +340,9 @@
         </item>
         <item row="1" column="1">
          <layout class="QFormLayout" name="FlArtInfo">
+          <property name="labelAlignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
           <item row="0" column="0">
            <widget class="QLabel" name="LblArtInfoLabelTitle">
             <property name="font">
@@ -339,6 +354,9 @@
             <property name="text">
              <string>Title:</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+            </property>
            </widget>
           </item>
           <item row="0" column="1">
@@ -347,7 +365,7 @@
              <string>[title]</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -365,6 +383,9 @@
             <property name="text">
              <string>Date:</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+            </property>
            </widget>
           </item>
           <item row="1" column="1">
@@ -373,7 +394,7 @@
              <string>[date]</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -391,6 +412,9 @@
             <property name="text">
              <string>Tags:</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+            </property>
            </widget>
           </item>
           <item row="2" column="1">
@@ -399,7 +423,7 @@
              <string>[tags]</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -457,7 +481,7 @@
      <x>0</x>
      <y>0</y>
      <width>1160</width>
-     <height>31</height>
+     <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

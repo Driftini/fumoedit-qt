@@ -139,7 +139,7 @@
     <item row="3" column="0" colspan="8">
      <widget class="QTabWidget" name="TwEditors">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="TabBody">
        <attribute name="title">
@@ -326,7 +326,7 @@
      <x>0</x>
      <y>0</y>
      <width>921</width>
-     <height>31</height>
+     <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="MenuFile">
@@ -398,14 +398,14 @@
  <layoutdefault spacing="6" margin="6"/>
  <customwidgets>
   <customwidget>
-   <class>FilenameEdit</class>
-   <extends>QLineEdit</extends>
-   <header>widgets.FilenameEdit</header>
-  </customwidget>
-  <customwidget>
    <class>ThumbnailPreview</class>
    <extends>QGraphicsView</extends>
    <header>widgets.ThumbnailPreview</header>
+  </customwidget>
+  <customwidget>
+   <class>FilenameEdit</class>
+   <extends>QLineEdit</extends>
+   <header>widgets.FilenameEdit</header>
   </customwidget>
  </customwidgets>
  <tabstops>

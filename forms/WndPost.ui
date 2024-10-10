@@ -62,11 +62,6 @@
         <string>Artwork</string>
        </property>
       </item>
-      <item>
-       <property name="text">
-        <string>Wallpapers</string>
-       </property>
-      </item>
      </widget>
     </item>
     <item row="1" column="0">
@@ -333,11 +328,7 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="ActionNewPost"/>
-    <addaction name="ActionOpenPost"/>
-    <addaction name="separator"/>
     <addaction name="ActionSavePost"/>
-    <addaction name="ActionSavePostAs"/>
     <addaction name="separator"/>
     <addaction name="ActionSettings"/>
     <addaction name="separator"/>
@@ -415,12 +406,15 @@
   <tabstop>LeTitle</tabstop>
   <tabstop>CbCollection</tabstop>
   <tabstop>LeThumbName</tabstop>
+  <tabstop>LeTags</tabstop>
+  <tabstop>PbKnownTags</tabstop>
   <tabstop>TwEditors</tabstop>
   <tabstop>PteBody</tabstop>
   <tabstop>TeBodyPreview</tabstop>
   <tabstop>CbBodyPreviewAutoscroll</tabstop>
   <tabstop>TwPictures</tabstop>
   <tabstop>GvPicturePreview</tabstop>
+  <tabstop>PbPictureAdd</tabstop>
   <tabstop>PbPictureEdit</tabstop>
   <tabstop>PbPictureDelete</tabstop>
  </tabstops>

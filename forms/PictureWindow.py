@@ -1,5 +1,6 @@
 from os import path
 from PyQt5 import QtWidgets, uic
+from settings import *
 
 
 class PictureWindow(QtWidgets.QDialog):
@@ -7,6 +8,11 @@ class PictureWindow(QtWidgets.QDialog):
         super().__init__(*args, **kwargs)
         uic.loadUi("forms/WndPicture.ui", self)
         self.connect_signals()
+
+        self.LeThumbFilename.path_part_1 = lambda: settings["site_path"]
+        self.LeThumbFilename.path_part_2 = lambda: self.picture.get_thumbnail_path()[1:]
+        self.LeOriginalFilename.path_part_1 = lambda: settings["site_path"]
+        self.LeOriginalFilename.path_part_2 = lambda: self.picture.get_original_path()[1:]
 
         # self.picture must be set before opening this dialog
 

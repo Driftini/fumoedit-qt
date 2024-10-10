@@ -1,4 +1,5 @@
 from datetime import date
+from forms.PostWindow import PostWindow
 from forms.SettingsWindow import SettingsWindow
 from os import path, listdir
 from PyQt5 import QtWidgets, uic
@@ -21,6 +22,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def connect_signals(self):
         self.ActionSettings.triggered.connect(self.show_settings)
 
+        self.PbAdd.clicked.connect(self.new_post)
+        self.PbEdit.clicked.connect(self.edit_post)
         self.PbRefresh.clicked.connect(self.load_collections)
 
         self.TwCollections.currentChanged.connect(self.clear_selection)
@@ -169,6 +172,32 @@ class MainWindow(QtWidgets.QMainWindow):
         self.TwArtPosts.setItem(new_row, 0, date_item)
         self.TwArtPosts.setItem(new_row, 1, title_item)
         self.TwArtPosts.setItem(new_row, 2, tags_item)
+
+    # Post management
+    def new_post(self):
+        editor = PostWindow(self)
+        editor.show()
+
+    def edit_post(self):
+        post = ""
+        collection_path = ""
+
+        # Figure out the active collection and get selected post in the TableWidget
+        match self.TwCollections.currentIndex():
+            case 0:  # Blog
+                row = self.TwBlogPosts.selectedIndexes()[0].row()
+                post = self.TwBlogPosts.item(row, 0).referenced_post
+            case 1:  # Artwork
+                row = self.TwArtPosts.selectedIndexes()[0].row()
+                post = self.TwArtPosts.item(row, 0).referenced_post
+
+        path = post.collection.get_post_path()+post.get_filename()
+        editor = PostWindow(self)
+        editor.load_post(post, path)
+        editor.show()
+
+    def delete_post(self):
+        pass
 
     # Selection management
     def toggle_selection(self, post):

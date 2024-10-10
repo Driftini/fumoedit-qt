@@ -28,16 +28,16 @@ class PostWindow(QtWidgets.QMainWindow):
         self.set_current_filepath(None)
         self.dirty_file = False
 
+        self.LeThumbName.path_part_1 = lambda: settings["site_path"]
+        self.LeThumbName.path_part_2 = lambda: self.current_post.get_prioritythumbnail_path()[1:]
+
         self.new_post()
 
         self.TwEditors.setCurrentIndex(1)
 
     def connect_signals(self):
         # Actions
-        self.ActionNewPost.triggered.connect(self.new_post)
-        self.ActionOpenPost.triggered.connect(self.open_post)
         self.ActionSavePost.triggered.connect(self.save_post)
-        self.ActionSavePostAs.triggered.connect(self.save_post_as)
         self.ActionSettings.triggered.connect(self.show_settings)
         self.ActionQuit.triggered.connect(self.close)
 
@@ -460,9 +460,10 @@ class PostWindow(QtWidgets.QMainWindow):
         # Else, only the visible values will change (so selection isn't lost)
         if (reset):
             self.TwPictures.clearContents()
+            self.TwPictures.setRowCount(len(self.current_post.pictures))
 
         for p in self.current_post.pictures:
-            self.TwPictures.insertRow(self.TwPictures.rowCount())
+            i = self.current_post.pictures.index(p)
 
             self.TwPictures.setItem(
                 i, 0, QtWidgets.QTableWidgetItem(p.get_label()))

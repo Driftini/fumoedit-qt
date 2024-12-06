@@ -24,13 +24,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.PbAdd.clicked.connect(self.new_post)
         self.PbEdit.clicked.connect(self.edit_post)
+        self.PbDelete.clicked.connect(self.delete_post)
         self.PbRefresh.clicked.connect(self.load_collections)
 
-        self.TwCollections.currentChanged.connect(self.clear_selection)
+        self.TwCollections.currentChanged.connect(self.tab_changed)
         self.TwBlogPosts.itemSelectionChanged.connect(self.blog_clicked)
         self.TwArtPosts.itemSelectionChanged.connect(self.art_clicked)
 
         self.PbSelectionClear.clicked.connect(self.clear_selection)
+        self.LeTags.textEdited.connect(self.taginput_edited)
         self.PbTagsAdd.clicked.connect(self.add_tags)
         self.PbTagsRemove.clicked.connect(self.remove_tags)
 
@@ -40,45 +42,73 @@ class MainWindow(QtWidgets.QMainWindow):
         #     self.check_settings()
 
     # Events
+    def tab_changed(self):
+        # Deselect rows in the post lists
+        self.TwBlogPosts.setCurrentCell(-1, -1)
+        self.TwArtPosts.setCurrentCell(-1, -1)
+
+        self.clear_selection()        
+
     def blog_clicked(self):
-        # Get selected post in the TableWidget
-        row = self.TwBlogPosts.selectedIndexes()[0].row()
-        post = self.TwBlogPosts.item(row, 0).referenced_post
+        sel = len(self.TwBlogPosts.selectedIndexes())>0
 
-        # Update info panel
-        date_str = post.date.strftime('%d %B %Y')
+        if sel:
+            # Get selected post in the TableWidget
+            row = self.TwBlogPosts.selectedIndexes()[0].row()
+            post = self.TwBlogPosts.item(row, 0).referenced_post
 
-        self.LblBlogInfoTitle.setText(post.title)
-        self.LblBlogInfoDate.setText(date_str)
-        self.LblBlogInfoTags.setText(post.get_tags())
+            # Update info panel
+            date_str = post.date.strftime('%d %B %Y')
 
-        if post.has_thumbnail():
-            self.GvPicturePreview.update_preview(post.get_thumbnail())
-        else:
-            self.GvPicturePreview.update_preview("")
+            self.LblBlogInfoTitle.setText(post.title)
+            self.LblBlogInfoDate.setText(date_str)
+            self.LblBlogInfoTags.setText(post.get_tags())
 
-        # Toggles blog post selection when shift-clicking
-        if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:
-            self.toggle_selection(post)
+            if post.has_thumbnail():
+                self.GvPicturePreview.update_preview(post.get_thumbnail())
+            else:
+                self.GvPicturePreview.update_preview("")
+
+            # Toggles blog post selection when shift-clicking
+            if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:
+                self.toggle_selection(post)
+
+        # Dis/enable edit/delete buttons
+        self.PbEdit.setDisabled(not sel)
+        self.PbDelete.setDisabled(not sel)
 
     def art_clicked(self):
-        # Get selected post in the TableWidget
-        row = self.TwArtPosts.selectedIndexes()[0].row()
-        post = self.TwArtPosts.item(row, 0).referenced_post
+        sel = len(self.TwArtPosts.selectedIndexes())>0
 
-        # Update info panel
-        date_str = post.date.strftime('%d %B %Y')
+        if sel:
+            # Get selected post in the TableWidget
+            row = self.TwArtPosts.selectedIndexes()[0].row()
+            post = self.TwArtPosts.item(row, 0).referenced_post
 
-        self.LblArtInfoTitle.setText(post.title)
-        self.LblArtInfoDate.setText(date_str)
-        self.LblArtInfoTags.setText(post.get_tags())
+            # Update info panel
+            date_str = post.date.strftime('%d %B %Y')
 
-        path, offset = post.get_thumbnail_withoffset()
-        self.GvArtSelectionPreview.update_preview(path, offset)
+            self.LblArtInfoTitle.setText(post.title)
+            self.LblArtInfoDate.setText(date_str)
+            self.LblArtInfoTags.setText(post.get_tags())
 
-        # Toggles blog post selection when shift-clicking
-        if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:
-            self.toggle_selection(post)
+            path, offset = post.get_thumbnail_withoffset()
+            self.GvArtSelectionPreview.update_preview(path, offset)
+
+            # Toggles art post selection when shift-clicking
+            if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:
+                self.toggle_selection(post)
+
+        # Dis/enable edit/delete buttons
+        self.PbEdit.setDisabled(not sel)
+        self.PbDelete.setDisabled(not sel)
+
+    def taginput_edited(self):
+        no_sel = len(self.selection)<1
+        no_taginput = len(self.LeTags.text())<1
+
+        self.PbTagsAdd.setDisabled(no_sel or no_taginput)
+        self.PbTagsRemove.setDisabled(no_sel or no_taginput)
 
     # Collection loading
     def load_collections(self):
@@ -94,7 +124,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     if filename[-3:] == ".md":
                         try:
                             posts.append(fumoedit.post_from_file(filepath))
-                        except e:
+                        except Exception as e:
                             print(e)
 
                 match c:
@@ -180,14 +210,19 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def edit_post(self):
         post = ""
-        collection_path = ""
 
         # Figure out the active collection and get selected post in the TableWidget
         match self.TwCollections.currentIndex():
             case 0:  # Blog
+                if len(self.TwBlogPosts.selectedIndexes())<1:
+                    return
+
                 row = self.TwBlogPosts.selectedIndexes()[0].row()
                 post = self.TwBlogPosts.item(row, 0).referenced_post
             case 1:  # Artwork
+                if len(self.TwArtPosts.selectedIndexes())<1:
+                    return
+                
                 row = self.TwArtPosts.selectedIndexes()[0].row()
                 post = self.TwArtPosts.item(row, 0).referenced_post
 
@@ -197,7 +232,7 @@ class MainWindow(QtWidgets.QMainWindow):
         editor.show()
 
     def delete_post(self):
-        pass
+        QtWidgets.QMessageBox.information(self, "TODO", "TODO")
 
     # Selection management
     def toggle_selection(self, post):
@@ -208,31 +243,39 @@ class MainWindow(QtWidgets.QMainWindow):
         self.update_selection_table()
 
     def clear_selection(self):
-        self.selection.clear()
+        self.selection.clear()        
         self.update_selection_table()
+
+        self.PbSelectionClear.setDisabled(True)
+
 
     def update_selection_table(self):
         self.TwSelection.clearContents()
         self.TwSelection.setRowCount(0)
 
-        print(self.selection)
+        sel = len(self.selection)>0
 
-        for post in self.selection:
-            new_row = self.TwSelection.rowCount()
+        if sel:
+            for post in self.selection:
+                new_row = self.TwSelection.rowCount()
 
-            self.TwSelection.insertRow(new_row)
+                self.TwSelection.insertRow(new_row)
 
-            date_str = post.date.strftime('%d %B %Y')
-            date_item = QtWidgets.QTableWidgetItem(date_str)
-            date_item.referenced_post = post
+                date_str = post.date.strftime('%d %B %Y')
+                date_item = QtWidgets.QTableWidgetItem(date_str)
+                date_item.referenced_post = post
 
-            title_item = QtWidgets.QTableWidgetItem(post.title)
+                title_item = QtWidgets.QTableWidgetItem(post.title)
 
-            tags_item = QtWidgets.QTableWidgetItem(post.get_tags())
+                tags_item = QtWidgets.QTableWidgetItem(post.get_tags())
 
-            self.TwSelection.setItem(new_row, 0, date_item)
-            self.TwSelection.setItem(new_row, 1, title_item)
-            self.TwSelection.setItem(new_row, 2, tags_item)
+                self.TwSelection.setItem(new_row, 0, date_item)
+                self.TwSelection.setItem(new_row, 1, title_item)
+                self.TwSelection.setItem(new_row, 2, tags_item)
+
+        self.PbSelectionClear.setDisabled(not sel)
+        self.PbTagsAdd.setDisabled(not sel)
+        self.PbTagsRemove.setDisabled(not sel)
 
     # Tags management
     def add_tags(self):

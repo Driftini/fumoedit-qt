@@ -31,6 +31,9 @@
     </item>
     <item row="1" column="2">
      <widget class="QPushButton" name="PbDelete">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Delete</string>
       </property>
@@ -38,6 +41,9 @@
     </item>
     <item row="1" column="1">
      <widget class="QPushButton" name="PbEdit">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="text">
        <string>Edit...</string>
       </property>
@@ -51,6 +57,9 @@
       <layout class="QGridLayout" name="gridLayout_5">
        <item row="3" column="3">
         <widget class="QPushButton" name="PbTagsRemove">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Remove</string>
          </property>
@@ -112,6 +121,9 @@
        </item>
        <item row="3" column="2">
         <widget class="QPushButton" name="PbTagsAdd">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="text">
           <string>Add</string>
          </property>
@@ -481,7 +493,7 @@
      <x>0</x>
      <y>0</y>
      <width>1160</width>
-     <height>28</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -519,6 +531,22 @@
    <header>widgets.ThumbnailPreview</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>TwCollections</tabstop>
+  <tabstop>TwBlogPosts</tabstop>
+  <tabstop>GvPicturePreview</tabstop>
+  <tabstop>PbAdd</tabstop>
+  <tabstop>PbEdit</tabstop>
+  <tabstop>PbDelete</tabstop>
+  <tabstop>PbRefresh</tabstop>
+  <tabstop>TwSelection</tabstop>
+  <tabstop>PbSelectionClear</tabstop>
+  <tabstop>LeTags</tabstop>
+  <tabstop>PbTagsAdd</tabstop>
+  <tabstop>PbTagsRemove</tabstop>
+  <tabstop>TwArtPosts</tabstop>
+  <tabstop>GvArtSelectionPreview</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

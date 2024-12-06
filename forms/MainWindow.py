@@ -1,7 +1,7 @@
 from datetime import date
 from forms.PostWindow import PostWindow
 from forms.SettingsWindow import SettingsWindow
-from os import path, listdir
+from os import path, listdir, remove
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtCore import Qt
 import fumoedit
@@ -112,6 +112,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # Collection loading
     def load_collections(self):
+        self.clear_selection()
+
         for c in fumoedit.COLLECTIONS:
             post_dir = settings['site_path']+fumoedit.COLLECTIONS[c].get_post_path()
 
@@ -135,7 +137,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         for p in posts:
                             self.append_blogpost(p)
                     case "artwork":
-                        # Clear the artwork post grid
+                        # Clear the SCRAPPED art grid
                         # From https://stackoverflow.com/a/13103617
                         # for i in reversed(range(self.TwArtPosts.count())):
                         #     self.TwArtPosts.itemAt(i).widget().setParent(None)
@@ -148,7 +150,7 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 msg = f"The {fumoedit.COLLECTIONS[c].label} collection's post folder couldn't be found.\n({post_dir})"
 
-                QtWidgets.QMessageBox.critical(self, "Failed to open load collection", msg)
+                QtWidgets.QMessageBox.critical(self, "Failed to load collection", msg)
 
     def append_blogpost(self, post):
         new_row = self.TwBlogPosts.rowCount()
@@ -204,14 +206,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.TwArtPosts.setItem(new_row, 2, tags_item)
 
     # Post management
-    def new_post(self):
-        editor = PostWindow(self)
-        editor.show()
-
-    def edit_post(self):
+    def get_selected_post(self):
+        # Figure out the active collection and get selected post in the TableWidget
         post = ""
 
-        # Figure out the active collection and get selected post in the TableWidget
         match self.TwCollections.currentIndex():
             case 0:  # Blog
                 if len(self.TwBlogPosts.selectedIndexes())<1:
@@ -226,13 +224,53 @@ class MainWindow(QtWidgets.QMainWindow):
                 row = self.TwArtPosts.selectedIndexes()[0].row()
                 post = self.TwArtPosts.item(row, 0).referenced_post
 
-        path = post.collection.get_post_path()+post.get_filename()
+        return post
+
+    def new_post(self):
         editor = PostWindow(self)
-        editor.load_post(post, path)
+        editor.show()
+
+    def edit_post(self):
+        post = self.get_selected_post()
+
+        filepath = f"{settings["site_path"]}/{post.collection.get_post_path()}/{post.get_filename()}"
+        filepath = path.normpath(filepath)
+
+        editor = PostWindow(self)
+        editor.load_post(post, filepath)
         editor.show()
 
     def delete_post(self):
-        QtWidgets.QMessageBox.information(self, "TODO", "TODO")
+        post = self.get_selected_post()
+
+        msgbox = QtWidgets.QMessageBox()
+        msgbox.setIcon(QtWidgets.QMessageBox.Warning)
+        reply = msgbox.question(
+            self,
+            "Delete post?",
+            f"The post \"{post.get_internal_name()}\" will be DELETED IRREVERSIBLY.\nAre you sure?",
+            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel,
+            QtWidgets.QMessageBox.Cancel
+        )
+
+        if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+            filepath = f"{settings["site_path"]}/{post.collection.get_post_path()}/{post.get_filename()}"
+            filepath = path.normpath(filepath)
+
+            try:
+                remove(filepath)
+
+                QtWidgets.QMessageBox.information(
+                    self, "Post deleted", f"The post \"{post.get_internal_name()}\" has been deleted successfully."
+                )
+            except FileNotFoundError:
+                absolute = path.abspath(filepath)
+    
+                QtWidgets.QMessageBox.critical(
+                    self, "Post not found", f"The post deletion has failed.\n\"{absolute}\" was not found."
+                )
+
+            self.load_collections()
 
     # Selection management
     def toggle_selection(self, post):

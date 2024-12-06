@@ -248,7 +248,7 @@
         <item row="0" column="1">
          <widget class="ThumbnailPreview" name="GvPicturePreview">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -321,7 +321,7 @@
      <x>0</x>
      <y>0</y>
      <width>921</width>
-     <height>28</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="MenuFile">

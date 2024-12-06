@@ -33,8 +33,6 @@ class PostWindow(QtWidgets.QMainWindow):
 
         self.new_post()
 
-        self.TwEditors.setCurrentIndex(1)
-
     def connect_signals(self):
         # Actions
         self.ActionSavePost.triggered.connect(self.save_post)
@@ -213,28 +211,6 @@ class PostWindow(QtWidgets.QMainWindow):
         else:
             self.setWindowTitle(f"Unsaved - FumoEdit-QT")
 
-    def open_post(self):
-        # Load a post from a file chosen
-        # via an open file dialog
-        if self.discard_confirmation():
-            dialog = QtWidgets.QFileDialog(self)
-            dialog.setFileMode(QtWidgets.QFileDialog.ExistingFile)
-            dialog.setNameFilter("Markdown files (*.md)")
-
-            if dialog.exec():
-                filepath = dialog.selectedFiles()[0]
-
-                try:
-                    post = fumoedit.post_from_file(filepath)
-                except (
-                    ScannerError, KeyError,
-                    AttributeError, fumoedit.PostNameError
-                ) as e:
-                    self.open_error(filepath, e)
-                else:
-                    self.load_post(post, filepath)
-                    self.undirty()
-
     def open_error(self, filepath, exception):
         # Display an error related to post opening,
         # with its relevant message.
@@ -296,36 +272,21 @@ class PostWindow(QtWidgets.QMainWindow):
         # Immediately save the current post if it already
         # has a filepath, otherwise let the user choose a
         # save directory.
+
         if self.validate_post():
             if not self.current_filepath:
-                self.save_post_as()
+                folderpath = f"{settings["site_path"]}/{self.current_post.collection.get_post_path()}"
             else:
                 folderpath = path.dirname(self.current_filepath)
-                self.save_post_internal(folderpath)
 
-    def save_post_as(self):
-        # Present a dialog to choose the save directory,
-        # then save the current post
-        if self.validate_post():
-            dialog = QtWidgets.QFileDialog(self)
-            dialog.setFileMode(QtWidgets.QFileDialog.DirectoryOnly)
-
-            if dialog.exec():
-                # Proper filepath will be set by save_post_internal,
-                # "placeholder" is appended so save_post_internal doesn't
-                # shave off the directory name from the filepath
-                # (which would actually point to a folder)
-                folderpath = dialog.selectedFiles()[0]
-                filepath = f"{folderpath}/{self.current_post.get_filename()}"
-                if self.overwrite_confirmation(filepath):
-                    self.save_post_internal(folderpath)
+            # No need to normalize the folder path, post_to_file does that on its own
+            self.save_post_internal(folderpath)
 
     # Post methods
     def new_post(self):
         # Load a blank post in the Blog collection
         if self.discard_confirmation():
             self.load_post(fumoedit.Post(fumoedit.COLLECTIONS["posts"]))
-            self.undirty()
             print(f"* Created new post at {currenttime()}")
 
     def load_post(self, post, filepath=None):
@@ -338,16 +299,17 @@ class PostWindow(QtWidgets.QMainWindow):
 
         self.LeID.setText(self.current_post.id)
         self.DeDate.setDate(self.current_post.date)
+        self.update_internal_name()
+        self.set_post_collection(self.current_post.collection.label)     
         self.LeTitle.setText(self.current_post.title)
         self.LeThumbName.setText(self.current_post.priority_thumbnail)
-        self.load_tags()
         self.PteBody.setPlainText(self.current_post.body)
+        self.load_tags()
 
-        self.update_internal_name()
         self.update_pictures_table(True)
         self.picture_selection_changed()  # to update buttons' status
 
-        self.CbCollection.setCurrentText(self.current_post.collection.label)
+        self.undirty()
 
     def update_internal_name(self):
         d_day = self.DeDate.date().day()
@@ -363,6 +325,8 @@ class PostWindow(QtWidgets.QMainWindow):
         # using the latters' "pretty names"
         id = ""
 
+        # Couldn't get this to work with fumoedit.COLLECTIONS[...].label/id
+        # so this stays hardcoded
         match label:
             case "Blog":
                 id = "posts"
@@ -406,24 +370,30 @@ class PostWindow(QtWidgets.QMainWindow):
     def validate_post(self):
         # Post validation conditions:
         # Has title, has ID, has body, tags don't start/end with comma (TODO)
-        to_fill = []
+        to_fix = []
 
         if len(self.LeTitle.text()) <= 0:
-            to_fill.append(self.LblTitle.text())
+            to_fix.append("Title is empty")
 
         if len(self.LeID.text()) <= 0:
-            to_fill.append(self.LblID.text())
+            to_fix.append("ID is empty")
 
         if len(self.PteBody.toPlainText()) <= 0:
-            to_fill.append(self.LblBody.text())
+            to_fix.append("Body is empty")
 
-        if len(to_fill) == 0:
+        tags_trimmed = self.LeTags.text().strip()
+
+        if len(tags_trimmed)>0:
+            if tags_trimmed[0]=="," or tags_trimmed[-1]==",":
+                to_fix.append("Tags must not begin or end with commas")
+
+        if len(to_fix) == 0:
             return True  # Validation successful
         else:
-            msg = "The following fields haven't been filled out:"
+            msg = "The post has failed validation:"
 
-            for f in to_fill:
-                msg += f"\n• {f[:-1]}"
+            for f in to_fix:
+                msg += f"\n• {f}"
 
             QtWidgets.QMessageBox.critical(
                 self, "Validation failed", msg
@@ -448,9 +418,13 @@ class PostWindow(QtWidgets.QMainWindow):
         # and save them to the current post
         tags = self.LeTags.text().split(",")
 
-        for t in tags:
-            i = tags.index(t)
-            tags[i] = t.strip()
+        if len(tags[0])>0:
+            # If there are any tags...
+            for t in tags:
+                i = tags.index(t)
+                tags[i] = t.strip()
+        else:
+            tags = []
 
         self.current_post.tags = tags
 

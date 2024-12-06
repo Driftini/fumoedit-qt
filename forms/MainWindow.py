@@ -30,6 +30,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.TwCollections.currentChanged.connect(self.tab_changed)
         self.TwBlogPosts.itemSelectionChanged.connect(self.blog_clicked)
         self.TwArtPosts.itemSelectionChanged.connect(self.art_clicked)
+        self.TwBlogPosts.itemDoubleClicked.connect(self.blog_clicked) # Ugly but necessary to allow to de/select
+        self.TwArtPosts.itemDoubleClicked.connect(self.art_clicked)   # a row in the tables that is already the current one
 
         self.PbSelectionClear.clicked.connect(self.clear_selection)
         self.LeTags.textEdited.connect(self.taginput_edited)
@@ -72,6 +74,8 @@ class MainWindow(QtWidgets.QMainWindow):
             # Toggles blog post selection when shift-clicking
             if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:
                 self.toggle_selection(post)
+        else:
+            self.GvPicturePreview.update_preview("")
 
         # Dis/enable edit/delete buttons
         self.PbEdit.setDisabled(not sel)
@@ -98,6 +102,8 @@ class MainWindow(QtWidgets.QMainWindow):
             # Toggles art post selection when shift-clicking
             if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:
                 self.toggle_selection(post)
+        else:
+            self.GvPicturePreview.update_preview("")
 
         # Dis/enable edit/delete buttons
         self.PbEdit.setDisabled(not sel)

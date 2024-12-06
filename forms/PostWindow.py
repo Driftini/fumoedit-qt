@@ -4,7 +4,7 @@ from forms.SettingsWindow import SettingsWindow
 from forms.PictureWindow import PictureWindow
 import fumoedit
 from os import path
-from PyQt5 import QtGui, QtWidgets, uic
+from PyQt5 import QtCore, QtWidgets, uic
 from PyQt5.QtCore import Qt
 from settings import *
 import time
@@ -16,6 +16,8 @@ def currenttime():
 
 
 class PostWindow(QtWidgets.QMainWindow):
+    saveSignal = QtCore.pyqtSignal()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         uic.loadUi("forms/WndPost.ui", self)
@@ -267,6 +269,7 @@ class PostWindow(QtWidgets.QMainWindow):
             )
 
             self.undirty()
+            self.saveSignal.emit()
 
     def save_post(self):
         # Immediately save the current post if it already

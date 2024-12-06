@@ -2,7 +2,7 @@ from datetime import date
 from forms.PostWindow import PostWindow
 from forms.SettingsWindow import SettingsWindow
 from os import path, listdir, remove
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtCore, QtWidgets, uic
 from PyQt5.QtCore import Qt
 import fumoedit
 from settings import *
@@ -10,14 +10,21 @@ from widgets.ThumbnailPreview import ThumbnailPreview
 
 
 class MainWindow(QtWidgets.QMainWindow):
+    saveSignal = QtCore.pyqtSignal()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         uic.loadUi("forms/WndMain.ui", self)
+        self.editor = PostWindow(self)
         self.connect_signals()
 
         self.selection = []
 
         self.reload_collections(False)
+
+    def post_saved(self):
+        self.reload_collections(True)
+        self.update_selection_table(True)
 
     def connect_signals(self):
         self.ActionSettings.triggered.connect(self.show_settings)
@@ -37,6 +44,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.LeTags.textEdited.connect(self.taginput_edited)
         self.PbTagsAdd.clicked.connect(self.add_tags)
         self.PbTagsRemove.clicked.connect(self.remove_tags)
+
+        self.editor.saveSignal.connect(self.post_saved)
 
     def show_settings(self):
         dialog = SettingsWindow(self)
@@ -74,8 +83,6 @@ class MainWindow(QtWidgets.QMainWindow):
             # Toggles blog post selection when shift-clicking
             if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:
                 self.toggle_selection(post)
-        else:
-            self.GvPicturePreview.update_preview("")
 
         # Dis/enable edit/delete buttons
         self.PbEdit.setDisabled(not sel)
@@ -102,8 +109,6 @@ class MainWindow(QtWidgets.QMainWindow):
             # Toggles art post selection when shift-clicking
             if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:
                 self.toggle_selection(post)
-        else:
-            self.GvPicturePreview.update_preview("")
 
         # Dis/enable edit/delete buttons
         self.PbEdit.setDisabled(not sel)
@@ -122,6 +127,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # Else, only the existing rows will change (so selection isn't lost)
         if not partial:
             self.clear_selection()
+            self.GvPicturePreview.update_preview("")
+            self.GvArtSelectionPreview.update_preview("")
 
         for c in fumoedit.COLLECTIONS:
             post_dir = settings['site_path']+fumoedit.COLLECTIONS[c].get_post_path()
@@ -241,8 +248,8 @@ class MainWindow(QtWidgets.QMainWindow):
         return post
 
     def new_post(self):
-        editor = PostWindow(self)
-        editor.show()
+        self.editor.show()
+        self.editor.raise_()
 
     def edit_post(self):
         post = self.get_selected_post()
@@ -250,9 +257,9 @@ class MainWindow(QtWidgets.QMainWindow):
         filepath = f"{settings["site_path"]}/{post.collection.get_post_path()}/{post.get_filename()}"
         filepath = path.normpath(filepath)
 
-        editor = PostWindow(self)
-        editor.load_post(post, filepath)
-        editor.show()
+        self.editor.load_post(post, filepath)
+        self.editor.show()
+        self.editor.raise_()
 
     def delete_post(self):
         post = self.get_selected_post()

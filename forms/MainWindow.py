@@ -27,7 +27,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.update_selection_table(True)
 
     def connect_signals(self):
+        self.ActionNew.triggered.connect(self.new_post)
+        self.ActionEdit.triggered.connect(self.edit_post)
+        self.ActionDelete.triggered.connect(self.delete_post)
+        self.ActionSelectionClear.triggered.connect(self.clear_selection)
         self.ActionSettings.triggered.connect(self.show_settings)
+        self.ActionQuit.triggered.connect(self.close)
 
         self.PbAdd.clicked.connect(self.new_post)
         self.PbEdit.clicked.connect(self.edit_post)
@@ -87,6 +92,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # Dis/enable edit/delete buttons
         self.PbEdit.setDisabled(not sel)
         self.PbDelete.setDisabled(not sel)
+        self.ActionEdit.setDisabled(not sel)
+        self.ActionDelete.setDisabled(not sel)
 
     def art_clicked(self):
         sel = len(self.TwArtPosts.selectedIndexes())>0
@@ -110,9 +117,11 @@ class MainWindow(QtWidgets.QMainWindow):
             if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:
                 self.toggle_selection(post)
 
-        # Dis/enable edit/delete buttons
+        # Dis/enable edit/delete actions/buttons
         self.PbEdit.setDisabled(not sel)
         self.PbDelete.setDisabled(not sel)
+        self.ActionEdit.setDisabled(not sel)
+        self.ActionDelete.setDisabled(not sel)
 
     def taginput_edited(self):
         no_sel = len(self.selection)<1
@@ -306,6 +315,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.update_selection_table(False)
 
         self.PbSelectionClear.setDisabled(True)
+        self.ActionSelectionClear.setDisabled(True)
 
 
     def update_selection_table(self, partial=False):
@@ -339,7 +349,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 row_counter += 1
 
-        self.PbSelectionClear.setDisabled(not sel or no_taginput)
+        self.PbSelectionClear.setDisabled(not sel)
+        self.ActionSelectionClear.setDisabled(not sel)
         self.PbTagsAdd.setDisabled(not sel or no_taginput)
         self.PbTagsRemove.setDisabled(not sel or no_taginput)
 

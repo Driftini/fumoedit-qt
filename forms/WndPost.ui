@@ -337,22 +337,6 @@
    <addaction name="MenuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="ActionNewPost">
-   <property name="text">
-    <string>&amp;New post...</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
-   </property>
-  </action>
-  <action name="ActionOpenPost">
-   <property name="text">
-    <string>&amp;Open post...</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+O</string>
-   </property>
-  </action>
   <action name="ActionSavePost">
    <property name="text">
     <string>&amp;Save</string>
@@ -361,20 +345,12 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="ActionSavePostAs">
-   <property name="text">
-    <string>Save &amp;As...</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
-   </property>
-  </action>
   <action name="ActionQuit">
    <property name="text">
     <string>&amp;Quit</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Q</string>
+    <string>Ctrl+W</string>
    </property>
   </action>
   <action name="ActionSettings">

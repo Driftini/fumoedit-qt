@@ -17,28 +17,29 @@ class ThumbnailPreview(QtWidgets.QGraphicsView):
         # I don't think I should instance a new scene every time
         scene = QtWidgets.QGraphicsScene()
 
-        actual_path = path.join(
-            settings["site_path"],
-            picture_path[1:]
-        )
-        absolute = path.abspath(actual_path)
-
-        # If the file exists...
-        if path.exists(absolute):
-            pixmap = QtGui.QPixmap(absolute)
-            pixmap = pixmap.scaled(
-                self.width() * 2, pixmap.height() * 2,
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation
+        if len(picture_path)>0:
+            actual_path = path.join(
+                settings["site_path"],
+                picture_path[1:]
             )
+            absolute = path.abspath(actual_path)
 
-            # Prepare offsets
-            offset_x = (pixmap.width() / 2) - self.width() / 2
-            offset_y = (self.height() - pixmap.height()) * offset_percent / 100
+            # If the file exists...
+            if path.exists(absolute):
+                pixmap = QtGui.QPixmap(absolute)
+                pixmap = pixmap.scaled(
+                    self.width() * 2, pixmap.height() * 2,
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation
+                )
 
-            # Apply offsets
-            pixmap_item = scene.addPixmap(pixmap)
-            pixmap_item.setOffset(-offset_x, offset_y)
+                # Prepare offsets
+                offset_x = (pixmap.width() / 2) - self.width() / 2
+                offset_y = (self.height() - pixmap.height()) * offset_percent / 100
+
+                # Apply offsets
+                pixmap_item = scene.addPixmap(pixmap)
+                pixmap_item.setOffset(-offset_x, offset_y)
 
         # This can be reached even if the file doesn't exist
         # or if there's no selected picture

@@ -17,7 +17,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.selection = []
 
-        self.load_collections()
+        self.reload_collections(False)
 
     def connect_signals(self):
         self.ActionSettings.triggered.connect(self.show_settings)
@@ -25,7 +25,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.PbAdd.clicked.connect(self.new_post)
         self.PbEdit.clicked.connect(self.edit_post)
         self.PbDelete.clicked.connect(self.delete_post)
-        self.PbRefresh.clicked.connect(self.load_collections)
+        self.PbRefresh.clicked.connect(self.reload_collections)
 
         self.TwCollections.currentChanged.connect(self.tab_changed)
         self.TwBlogPosts.itemSelectionChanged.connect(self.blog_clicked)
@@ -111,14 +111,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.PbTagsRemove.setDisabled(no_sel or no_taginput)
 
     # Collection loading
-    def load_collections(self):
-        self.clear_selection()
+    def reload_collections(self, partial=False):
+        # If partial is off, the contents will be cleared and reinserted
+        # Else, only the existing rows will change (so selection isn't lost)
+        if not partial:
+            self.clear_selection()
 
         for c in fumoedit.COLLECTIONS:
             post_dir = settings['site_path']+fumoedit.COLLECTIONS[c].get_post_path()
 
             if path.exists(post_dir):
                 posts = []
+                current_row = 0
 
                 for filename in sorted(listdir(post_dir), reverse=True):
                     filepath = f"{post_dir}/{filename}"
@@ -132,10 +136,16 @@ class MainWindow(QtWidgets.QMainWindow):
                 match c:
                     case "posts":
                         self.TwBlogPosts.clearContents()
-                        self.TwBlogPosts.setRowCount(0)
+                        if not partial:
+                            self.TwBlogPosts.setRowCount(0)
 
                         for p in posts:
-                            self.append_blogpost(p)
+                            if not partial:
+                                self.TwBlogPosts.insertRow(current_row)
+
+                            self.append_blogpost(p, current_row)
+
+                            current_row += 1
                     case "artwork":
                         # Clear the SCRAPPED art grid
                         # From https://stackoverflow.com/a/13103617
@@ -143,21 +153,23 @@ class MainWindow(QtWidgets.QMainWindow):
                         #     self.TwArtPosts.itemAt(i).widget().setParent(None)
 
                         self.TwArtPosts.clearContents()
-                        self.TwArtPosts.setRowCount(0)
+                        if not partial:
+                            self.TwArtPosts.setRowCount(0)
 
                         for p in posts:
-                            self.append_artpost(p)
+                            if not partial:
+                                self.TwArtPosts.insertRow(current_row)
+                                
+                            self.append_artpost(p, current_row)
+
+                            current_row += 1
             else:
                 msg = f"The {fumoedit.COLLECTIONS[c].label} collection's post folder couldn't be found.\n({post_dir})"
 
                 QtWidgets.QMessageBox.critical(self, "Failed to load collection", msg)
 
-    def append_blogpost(self, post):
-        new_row = self.TwBlogPosts.rowCount()
-
-        self.TwBlogPosts.insertRow(new_row)
-
-        date_str = post.date.strftime('%d %B %Y')
+    def append_blogpost(self, post, row):
+        date_str = post.date.strftime(r'%d %B %Y')
         date_item = QtWidgets.QTableWidgetItem(date_str)
         date_item.referenced_post = post
 
@@ -165,9 +177,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         tags_item = QtWidgets.QTableWidgetItem(post.get_tags())
 
-        self.TwBlogPosts.setItem(new_row, 0, date_item)
-        self.TwBlogPosts.setItem(new_row, 1, title_item)
-        self.TwBlogPosts.setItem(new_row, 2, tags_item)
+        self.TwBlogPosts.setItem(row, 0, date_item)
+        self.TwBlogPosts.setItem(row, 1, title_item)
+        self.TwBlogPosts.setItem(row, 2, tags_item)
 
     # SCRAPPED ART GRID
     # def append_artpost(self, post):
@@ -188,12 +200,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # w.update_preview(thumb_path, post.pictures[0].thumbnail_offset)
 
-    def append_artpost(self, post):
-        new_row = self.TwArtPosts.rowCount()
-
-        self.TwArtPosts.insertRow(new_row)
-
-        date_str = post.date.strftime('%d %B %Y')
+    def append_artpost(self, post, row):
+        date_str = post.date.strftime(r'%d %B %Y')
         date_item = QtWidgets.QTableWidgetItem(date_str)
         date_item.referenced_post = post
 
@@ -201,9 +209,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         tags_item = QtWidgets.QTableWidgetItem(post.get_tags())
 
-        self.TwArtPosts.setItem(new_row, 0, date_item)
-        self.TwArtPosts.setItem(new_row, 1, title_item)
-        self.TwArtPosts.setItem(new_row, 2, tags_item)
+        self.TwArtPosts.setItem(row, 0, date_item)
+        self.TwArtPosts.setItem(row, 1, title_item)
+        self.TwArtPosts.setItem(row, 2, tags_item)
 
     # Post management
     def get_selected_post(self):
@@ -270,7 +278,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self, "Post not found", f"The post deletion has failed.\n\"{absolute}\" was not found."
                 )
 
-            self.load_collections()
+            self.reload_collections(False)
 
     # Selection management
     def toggle_selection(self, post):
@@ -278,26 +286,31 @@ class MainWindow(QtWidgets.QMainWindow):
             self.selection.remove(post)
         else:
             self.selection.append(post)
-        self.update_selection_table()
+        self.update_selection_table(False)
 
     def clear_selection(self):
-        self.selection.clear()        
-        self.update_selection_table()
+        self.selection.clear()
+        self.update_selection_table(False)
 
         self.PbSelectionClear.setDisabled(True)
 
 
-    def update_selection_table(self):
+    def update_selection_table(self, partial=False):
+        # If partial is off, the contents will be cleared and reinserted
+        # Else, only the existing rows will change (so selection isn't lost)
         self.TwSelection.clearContents()
-        self.TwSelection.setRowCount(0)
+        if not partial:
+            self.TwSelection.setRowCount(0)
 
         sel = len(self.selection)>0
+        no_taginput = len(self.LeTags.text())<1
 
         if sel:
-            for post in self.selection:
-                new_row = self.TwSelection.rowCount()
+            row_counter = 0
 
-                self.TwSelection.insertRow(new_row)
+            for post in self.selection:
+                if not partial:
+                    self.TwSelection.insertRow(row_counter)
 
                 date_str = post.date.strftime('%d %B %Y')
                 date_item = QtWidgets.QTableWidgetItem(date_str)
@@ -307,31 +320,45 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 tags_item = QtWidgets.QTableWidgetItem(post.get_tags())
 
-                self.TwSelection.setItem(new_row, 0, date_item)
-                self.TwSelection.setItem(new_row, 1, title_item)
-                self.TwSelection.setItem(new_row, 2, tags_item)
+                self.TwSelection.setItem(row_counter, 0, date_item)
+                self.TwSelection.setItem(row_counter, 1, title_item)
+                self.TwSelection.setItem(row_counter, 2, tags_item)
 
-        self.PbSelectionClear.setDisabled(not sel)
-        self.PbTagsAdd.setDisabled(not sel)
-        self.PbTagsRemove.setDisabled(not sel)
+                row_counter += 1
+
+        self.PbSelectionClear.setDisabled(not sel or no_taginput)
+        self.PbTagsAdd.setDisabled(not sel or no_taginput)
+        self.PbTagsRemove.setDisabled(not sel or no_taginput)
 
     # Tags management
     def add_tags(self):
         new_tags = self.LeTags.text().split(",")
 
-        for id in self.selection:
-            post = self.selection[id]
+        for post in self.selection:
+            if len(new_tags[0].strip())>0:
+                for tag in new_tags:
+                    if tag not in post.tags:
+                        post.tags.append(tag.strip())
+        
+                filepath = f"{settings["site_path"]}/{post.collection.get_post_path()}/{post.get_filename()}"
+                filepath = path.normpath(filepath)
+                fumoedit.post_to_file(post, path.dirname(filepath))
 
-            for tag in new_tags:
-                if tag not in post.tags:
-                    post.tags.append(tag.strip())
+        self.reload_collections(True)
+        self.update_selection_table(True)
 
     def remove_tags(self):
         removed_tags = self.LeTags.text().split(",")
 
-        for id in self.selection:
-            post = self.selection[id]
+        for post in self.selection:
+            if len(removed_tags[0].strip())>0:
+                for tag in removed_tags:
+                    if tag in post.tags:
+                        post.tags.remove(tag.strip())
 
-            for tag in removed_tags:
-                if tag in post.tags:
-                    post.tags.remove(tag)
+                filepath = f"{settings["site_path"]}/{post.collection.get_post_path()}/{post.get_filename()}"
+                filepath = path.normpath(filepath)
+                fumoedit.post_to_file(post, path.dirname(filepath))
+
+        self.reload_collections(True)
+        self.update_selection_table(True)

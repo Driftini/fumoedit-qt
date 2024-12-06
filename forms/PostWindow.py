@@ -306,7 +306,7 @@ class PostWindow(QtWidgets.QMainWindow):
         self.PteBody.setPlainText(self.current_post.body)
         self.load_tags()
 
-        self.update_pictures_table(True)
+        self.update_pictures_table(False)
         self.picture_selection_changed()  # to update buttons' status
 
         self.undirty()
@@ -418,7 +418,7 @@ class PostWindow(QtWidgets.QMainWindow):
         # and save them to the current post
         tags = self.LeTags.text().split(",")
 
-        if len(tags[0])>0:
+        if len(tags[0].strip())>0:
             # If there are any tags...
             for t in tags:
                 i = tags.index(t)
@@ -429,10 +429,10 @@ class PostWindow(QtWidgets.QMainWindow):
         self.current_post.tags = tags
 
     # Picture methods
-    def update_pictures_table(self, reset):
-        # If reset is on, the contents will be cleared and reinserted
-        # Else, only the visible values will change (so selection isn't lost)
-        if (reset):
+    def update_pictures_table(self, partial):
+        # If partial is off, the contents will be cleared and reinserted
+        # Else, only the existing rows will change (so selection isn't lost)
+        if not partial:
             self.TwPictures.clearContents()
             self.TwPictures.setRowCount(len(self.current_post.pictures))
 
@@ -486,7 +486,7 @@ class PostWindow(QtWidgets.QMainWindow):
         dialog.load_picture()  # eugh
         if dialog.exec() and dialog.result():
             self.current_post = temp
-            self.update_pictures_table(True)
+            self.update_pictures_table(False)
 
     def open_picture(self):
         # Open the selected picture from the current post through the Picture Editor
@@ -498,11 +498,11 @@ class PostWindow(QtWidgets.QMainWindow):
         dialog.load_picture()  # eugh
         if dialog.exec() and dialog.result():
             self.current_post.pictures[selected_index] = temp
-            self.update_pictures_table(False)
+            self.update_pictures_table(True)
 
     def delete_picture(self):
         # Delete the selected picture from the current post
         selected_index = self.get_selected_pictureindex()
 
         del self.current_post.pictures[selected_index]
-        self.update_pictures_table(True)
+        self.update_pictures_table(False)

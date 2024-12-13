@@ -4,7 +4,6 @@ from forms.SettingsWindow import SettingsWindow
 from os import path, listdir, remove
 from PyQt5 import QtCore, QtWidgets, uic
 from PyQt5.QtCore import Qt
-import fumoedit
 from settings import *
 from widgets.ThumbnailPreview import ThumbnailPreview
 
@@ -81,9 +80,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.LblBlogInfoTags.setText(post.get_tags())
 
             if post.has_thumbnail():
-                self.GvPicturePreview.update_preview(post.get_thumbnail())
+                self.GvPicturePreview.update_preview(post.get_thumbnail_ospath())
             else:
-                self.GvPicturePreview.update_preview("")
+                self.GvPicturePreview.update_preview()
 
             # Toggles blog post selection when shift-clicking
             if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:
@@ -110,7 +109,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.LblArtInfoDate.setText(date_str)
             self.LblArtInfoTags.setText(post.get_tags())
 
-            path, offset = post.get_thumbnail_withoffset()
+            path, offset = post.get_thumbnail_ospath_withoffset()
             self.GvArtSelectionPreview.update_preview(path, offset)
 
             # Toggles art post selection when shift-clicking
@@ -136,18 +135,18 @@ class MainWindow(QtWidgets.QMainWindow):
         # Else, only the existing rows will change (so selection isn't lost)
         if not partial:
             self.clear_selection()
-            self.GvPicturePreview.update_preview("")
-            self.GvArtSelectionPreview.update_preview("")
+            self.GvPicturePreview.update_preview()
+            self.GvArtSelectionPreview.update_preview()
 
         for c in fumoedit.COLLECTIONS:
-            post_dir = settings['site_path']+fumoedit.COLLECTIONS[c].get_post_path()
+            post_dir = fumoedit.COLLECTIONS[c].get_post_ospath()
 
             if path.exists(post_dir):
                 posts = []
                 current_row = 0
 
                 for filename in sorted(listdir(post_dir), reverse=True):
-                    filepath = f"{post_dir}/{filename}"
+                    filepath = path.normpath(f"{post_dir}/{filename}")
 
                     if filename[-3:] == ".md":
                         try:
@@ -263,8 +262,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def edit_post(self):
         post = self.get_selected_post()
 
-        filepath = f"{settings["site_path"]}/{post.collection.get_post_path()}/{post.get_filename()}"
-        filepath = path.normpath(filepath)
+        filepath = post.get_ospath()
 
         self.editor.load_post(post, filepath)
         self.editor.show()
@@ -284,8 +282,7 @@ class MainWindow(QtWidgets.QMainWindow):
         )
 
         if reply == QtWidgets.QMessageBox.StandardButton.Yes:
-            filepath = f"{settings["site_path"]}/{post.collection.get_post_path()}/{post.get_filename()}"
-            filepath = path.normpath(filepath)
+            filepath = post.get_ospath()
 
             try:
                 remove(filepath)
@@ -364,9 +361,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     if tag not in post.tags:
                         post.tags.append(tag.strip())
         
-                filepath = f"{settings["site_path"]}/{post.collection.get_post_path()}/{post.get_filename()}"
-                filepath = path.normpath(filepath)
-                fumoedit.post_to_file(post, path.dirname(filepath))
+                fumoedit.post_to_file(post)
 
         self.reload_collections(True)
         self.update_selection_table(True)
@@ -380,9 +375,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     if tag in post.tags:
                         post.tags.remove(tag.strip())
 
-                filepath = f"{settings["site_path"]}/{post.collection.get_post_path()}/{post.get_filename()}"
-                filepath = path.normpath(filepath)
-                fumoedit.post_to_file(post, path.dirname(filepath))
+                fumoedit.post_to_file(post)
 
         self.reload_collections(True)
         self.update_selection_table(True)

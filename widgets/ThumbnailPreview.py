@@ -10,23 +10,17 @@ class ThumbnailPreview(QtWidgets.QGraphicsView):
 
         # self.setStyleSheet("ThumbnailPreview:focus { border: 5px solid #f83 }")
 
-    def update_preview(self, picture_path, offset_percent=50):
+    def update_preview(self, picture_path=None, offset_percent=50):
         # Update the picture shown,
         # while scaling and applying the vertical offset
 
         # I don't think I should instance a new scene every time
         scene = QtWidgets.QGraphicsScene()
 
-        if len(picture_path)>0:
-            actual_path = path.join(
-                settings["site_path"],
-                picture_path[1:]
-            )
-            absolute = path.abspath(actual_path)
-
+        if picture_path: # not 0, normpath turns empty strings into "."
             # If the file exists...
-            if path.exists(absolute):
-                pixmap = QtGui.QPixmap(absolute)
+            if path.exists(picture_path):
+                pixmap = QtGui.QPixmap(picture_path)
                 pixmap = pixmap.scaled(
                     self.width() * 2, pixmap.height() * 2,
                     Qt.AspectRatioMode.KeepAspectRatio,

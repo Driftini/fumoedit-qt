@@ -9,9 +9,9 @@ class PictureWindow(QtWidgets.QDialog):
         uic.loadUi("forms/WndPicture.ui", self)
         self.connect_signals()
 
-        self.LeThumbFilename.path_part_1 = lambda: settings["site_path"]
+        self.LeThumbFilename.path_part_1 = lambda: fumoedit.site_path
         self.LeThumbFilename.path_part_2 = lambda: self.picture.get_thumbnail_path()[1:]
-        self.LeOriginalFilename.path_part_1 = lambda: settings["site_path"]
+        self.LeOriginalFilename.path_part_1 = lambda: fumoedit.site_path
         self.LeOriginalFilename.path_part_2 = lambda: self.picture.get_original_path()[1:]
 
         # self.picture must be set before opening this dialog
@@ -24,11 +24,6 @@ class PictureWindow(QtWidgets.QDialog):
         # Override to commit changes upon pressing OK
         self.save_picture()
         super().accept()
-
-    def save_variant(self):
-        print(
-            f"* Saved variant {self.current_variant.get_label()} at {currenttime()}"
-        )
 
     def validate_picture(self):
         # TODO
@@ -61,7 +56,7 @@ class PictureWindow(QtWidgets.QDialog):
     def update_thumbnail_preview(self):
         # Saving the pic outside of save method is painful
         self.picture.thumbnail_filename = self.LeThumbFilename.text()
-        path = self.picture.get_thumbnail_path()
+        path = self.picture.get_thumbnail_ospath()
         offset_percent = int(self.SbThumbPos.cleanText())
 
         self.GvThumbPreview.update_preview(path, offset_percent)

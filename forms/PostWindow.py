@@ -2,7 +2,6 @@ from copy import deepcopy
 from datetime import date
 from forms.SettingsWindow import SettingsWindow
 from forms.PictureWindow import PictureWindow
-import fumoedit
 from os import path
 from PyQt5 import QtCore, QtWidgets, uic
 from PyQt5.QtCore import Qt
@@ -30,7 +29,7 @@ class PostWindow(QtWidgets.QMainWindow):
         self.set_current_filepath(None)
         self.dirty_file = False
 
-        self.LeThumbName.path_part_1 = lambda: settings["site_path"]
+        self.LeThumbName.path_part_1 = lambda: fumoedit.site_path
         self.LeThumbName.path_part_2 = lambda: self.current_post.get_prioritythumbnail_path()[1:]
 
         self.new_post()
@@ -263,10 +262,7 @@ class PostWindow(QtWidgets.QMainWindow):
 
             self.save_tags()
 
-            fumoedit.post_to_file(
-                self.current_post,
-                path.dirname(self.current_filepath)
-            )
+            fumoedit.post_to_file(self.current_post)
 
             self.undirty()
             self.saveSignal.emit()
@@ -278,7 +274,7 @@ class PostWindow(QtWidgets.QMainWindow):
 
         if self.validate_post():
             if not self.current_filepath:
-                folderpath = f"{settings["site_path"]}/{self.current_post.collection.get_post_path()}"
+                folderpath = self.current_post.collection.get_post_ospath()
             else:
                 folderpath = path.dirname(self.current_filepath)
 
@@ -475,7 +471,7 @@ class PostWindow(QtWidgets.QMainWindow):
         if selected_index >= 0:
             picture = self.current_post.pictures[selected_index]
 
-            path = picture.get_thumbnail_path()
+            path = picture.get_thumbnail_ospath()
             offset_percent = int(picture.thumbnail_offset)
 
         self.GvPicturePreview.update_preview(path, offset_percent)

@@ -9,7 +9,7 @@ class SettingsWindow(QtWidgets.QDialog):
         uic.loadUi("forms/WndSettings.ui", self)
         self.connect_signals()
 
-        self.LeSitePath.path_part_1 = self.LeSitePath.text
+        self.LeSitePath.input_path = self.LeSitePath.text
 
         self.CbWrapBody.setChecked(settings["wrap_body"])
         self.CbWrapPreview.setChecked(settings["wrap_preview"])

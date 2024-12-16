@@ -9,14 +9,13 @@ class PictureWindow(QtWidgets.QDialog):
         uic.loadUi("forms/WndPicture.ui", self)
         self.connect_signals()
 
-        self.LeThumbFilename.path_part_1 = lambda: fumoedit.site_path
-        self.LeThumbFilename.path_part_2 = lambda: self.picture.get_thumbnail_path()[1:]
-        self.LeOriginalFilename.path_part_1 = lambda: fumoedit.site_path
-        self.LeOriginalFilename.path_part_2 = lambda: self.picture.get_original_path()[1:]
+        self.LeThumbFilename.input_path = lambda: self.picture.get_thumbnail_ospath()
+        self.LeOriginalFilename.input_path = lambda: self.picture.get_original_ospath()
 
         # self.picture must be set before opening this dialog
 
     def connect_signals(self):
+        self.LeOriginalFilename.textEdited.connect(self.update_thumbnail_preview)
         self.LeThumbFilename.textEdited.connect(self.update_thumbnail_preview)
         self.SbThumbPos.valueChanged.connect(self.update_thumbnail_preview)
 
@@ -55,6 +54,7 @@ class PictureWindow(QtWidgets.QDialog):
 
     def update_thumbnail_preview(self):
         # Saving the pic outside of save method is painful
+        self.picture.original_filename = self.LeOriginalFilename.text()
         self.picture.thumbnail_filename = self.LeThumbFilename.text()
         path = self.picture.get_thumbnail_ospath()
         offset_percent = int(self.SbThumbPos.cleanText())

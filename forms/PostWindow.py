@@ -29,8 +29,7 @@ class PostWindow(QtWidgets.QMainWindow):
         self.set_current_filepath(None)
         self.dirty_file = False
 
-        self.LeThumbName.path_part_1 = lambda: fumoedit.site_path
-        self.LeThumbName.path_part_2 = lambda: self.current_post.get_prioritythumbnail_path()[1:]
+        self.LeThumbName.input_path = lambda: self.current_post.get_prioritythumbnail_ospath()
 
         self.new_post()
 
@@ -460,7 +459,7 @@ class PostWindow(QtWidgets.QMainWindow):
             return selected_rows[0].row()
 
     def picture_selection_changed(self):
-        if self.get_selected_pictureindex():
+        if self.get_selected_pictureindex() != None:
             self.PbPictureEdit.setDisabled(False)
             self.PbPictureDelete.setDisabled(False)
         else:
@@ -474,7 +473,7 @@ class PostWindow(QtWidgets.QMainWindow):
         offset_percent = 0
 
         selected_index = self.get_selected_pictureindex()
-        if selected_index:
+        if selected_index != None:
             picture = self.current_post.pictures[selected_index]
 
             path = picture.get_thumbnail_ospath()
@@ -502,7 +501,7 @@ class PostWindow(QtWidgets.QMainWindow):
         self.TwEditors.setCurrentIndex(1)
 
         selected_index = self.get_selected_pictureindex()
-        if selected_index:
+        if selected_index != None:
             temp = deepcopy(self.current_post.pictures[selected_index])
 
             dialog = PictureWindow(self)
@@ -518,6 +517,6 @@ class PostWindow(QtWidgets.QMainWindow):
         self.TwEditors.setCurrentIndex(1)
 
         selected_index = self.get_selected_pictureindex()
-        if selected_index:
+        if selected_index != None:
             del self.current_post.pictures[selected_index]
             self.update_pictures_table(False)

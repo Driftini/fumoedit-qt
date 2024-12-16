@@ -537,7 +537,7 @@
   </action>
   <action name="ActionQuit">
    <property name="text">
-    <string>Quit</string>
+    <string>&amp;Quit</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
@@ -545,7 +545,7 @@
   </action>
   <action name="ActionNew">
    <property name="text">
-    <string>New...</string>
+    <string>&amp;New...</string>
    </property>
    <property name="toolTip">
     <string>Create a new post...</string>
@@ -559,7 +559,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Edit...</string>
+    <string>&amp;Edit...</string>
    </property>
    <property name="toolTip">
     <string>Edit the selected post...</string>
@@ -573,7 +573,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Clear selection</string>
+    <string>&amp;Clear selection</string>
    </property>
    <property name="toolTip">
     <string>Clear the list of selected posts</string>
@@ -587,7 +587,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Delete</string>
+    <string>&amp;Delete</string>
    </property>
    <property name="toolTip">
     <string>Delete the selected post</string>

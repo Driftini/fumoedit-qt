@@ -36,6 +36,9 @@ class PostWindow(QtWidgets.QMainWindow):
 
     def connect_signals(self):
         # Actions
+        self.ActionPictureNew.triggered.connect(self.add_picture)
+        self.ActionPictureEdit.triggered.connect(self.open_picture)
+        self.ActionPictureDelete.triggered.connect(self.delete_picture)
         self.ActionSavePost.triggered.connect(self.save_post)
         self.ActionSettings.triggered.connect(self.show_settings)
         self.ActionQuit.triggered.connect(self.close)
@@ -338,6 +341,11 @@ class PostWindow(QtWidgets.QMainWindow):
         # the current post is a picture post
         self.TwEditors.setTabEnabled(1, self.current_post.is_picturepost())
 
+        # Enable or disable picture actions
+        self.ActionPictureNew.setDisabled(not self.current_post.is_picturepost())
+        self.ActionPictureEdit.setDisabled(not self.current_post.is_picturepost())
+        self.ActionPictureDelete.setDisabled(not self.current_post.is_picturepost())
+
     def update_post_preview(self):
         # Update the Markdown preview of the post body, while retaining
         # the old scrollbar position unless autoscroll has been enabled.
@@ -450,11 +458,9 @@ class PostWindow(QtWidgets.QMainWindow):
 
         if len(selected_rows) > 0:
             return selected_rows[0].row()
-        else:
-            return -1
 
     def picture_selection_changed(self):
-        if self.get_selected_pictureindex() >= 0:
+        if self.get_selected_pictureindex():
             self.PbPictureEdit.setDisabled(False)
             self.PbPictureDelete.setDisabled(False)
         else:
@@ -464,11 +470,11 @@ class PostWindow(QtWidgets.QMainWindow):
         self.update_thumbnail_preview()
 
     def update_thumbnail_preview(self):
-        path = ""
+        path = None
         offset_percent = 0
 
         selected_index = self.get_selected_pictureindex()
-        if selected_index >= 0:
+        if selected_index:
             picture = self.current_post.pictures[selected_index]
 
             path = picture.get_thumbnail_ospath()
@@ -477,7 +483,10 @@ class PostWindow(QtWidgets.QMainWindow):
         self.GvPicturePreview.update_preview(path, offset_percent)
 
     def add_picture(self):
-        # Add a new picture to the current post through the Picture Editor
+        # Bring focus to the pictures tab, and
+        # add a new picture to the current post through the Picture Editor
+        self.TwEditors.setCurrentIndex(1)
+
         temp = deepcopy(self.current_post)
 
         dialog = PictureWindow(self)
@@ -488,20 +497,27 @@ class PostWindow(QtWidgets.QMainWindow):
             self.update_pictures_table(False)
 
     def open_picture(self):
-        # Open the selected picture from the current post through the Picture Editor
-        selected_index = self.get_selected_pictureindex()
-        temp = deepcopy(self.current_post.pictures[selected_index])
+        # Bring focus to the pictures tab, and
+        # open the selected picture from the current post through the Picture Editor
+        self.TwEditors.setCurrentIndex(1)
 
-        dialog = PictureWindow(self)
-        dialog.picture = temp
-        dialog.load_picture()  # eugh
-        if dialog.exec() and dialog.result():
-            self.current_post.pictures[selected_index] = temp
-            self.update_pictures_table(True)
+        selected_index = self.get_selected_pictureindex()
+        if selected_index:
+            temp = deepcopy(self.current_post.pictures[selected_index])
+
+            dialog = PictureWindow(self)
+            dialog.picture = temp
+            dialog.load_picture()  # eugh
+            if dialog.exec() and dialog.result():
+                self.current_post.pictures[selected_index] = temp
+                self.update_pictures_table(True)
 
     def delete_picture(self):
-        # Delete the selected picture from the current post
-        selected_index = self.get_selected_pictureindex()
+        # Bring focus to the pictures tab, and
+        # delete the selected picture from the current post
+        self.TwEditors.setCurrentIndex(1)
 
-        del self.current_post.pictures[selected_index]
-        self.update_pictures_table(False)
+        selected_index = self.get_selected_pictureindex()
+        if selected_index:
+            del self.current_post.pictures[selected_index]
+            self.update_pictures_table(False)

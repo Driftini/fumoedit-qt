@@ -134,7 +134,7 @@
     <item row="3" column="0" colspan="8">
      <widget class="QTabWidget" name="TwEditors">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="TabBody">
        <attribute name="title">
@@ -334,7 +334,16 @@
     <addaction name="separator"/>
     <addaction name="ActionQuit"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="ActionPictureNew"/>
+    <addaction name="ActionPictureEdit"/>
+    <addaction name="ActionPictureDelete"/>
+   </widget>
    <addaction name="MenuFile"/>
+   <addaction name="menuEdit"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="ActionSavePost">
@@ -347,7 +356,10 @@
   </action>
   <action name="ActionQuit">
    <property name="text">
-    <string>&amp;Quit</string>
+    <string>Close &amp;window</string>
+   </property>
+   <property name="toolTip">
+    <string>Close the post editor window</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
@@ -359,6 +371,39 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+,</string>
+   </property>
+  </action>
+  <action name="ActionPictureEdit">
+   <property name="text">
+    <string>&amp;Edit picture...</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit the selected picture</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="ActionPictureNew">
+   <property name="text">
+    <string>New &amp;picture</string>
+   </property>
+   <property name="toolTip">
+    <string>Add a new picture to this post</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="ActionPictureDelete">
+   <property name="text">
+    <string>&amp;Delete picture</string>
+   </property>
+   <property name="toolTip">
+    <string>Delete the selected picture</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Del</string>
    </property>
   </action>
  </widget>

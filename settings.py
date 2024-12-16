@@ -10,7 +10,8 @@ settings = {
     "wrap_preview": True,
     "fontsize_body": 8,
     "fontsize_preview": 9,
-    "site_path": path.normpath("/")
+    "site_path": path.normpath("/"),
+    "tag_priority": []
 }
 
 
@@ -19,7 +20,7 @@ def load_settings():
         with open(SETTINGS_FILE, mode="br") as f:
             settings.update(pickle.load(f))
 
-            fumoedit.site_path = settings["site_path"]
+            sync_fumoedit()
     except (OSError):
         # If file doesn't exist, create one with default settings
         save_settings()
@@ -28,7 +29,19 @@ def load_settings():
 def save_settings():
     with open(SETTINGS_FILE, mode="bw") as f:
         pickle.dump(settings, f)
+    
+    sync_fumoedit()
 
 
 def set_site_path(newpath):
     settings["site_path"] = path.normpath(newpath)
+
+
+def set_tag_priority(newtp):
+    settings["tag_priority"] = list(dict.fromkeys(newtp)).copy()
+
+
+def sync_fumoedit():
+    # Synchronize shared settings between FumoEdit-QT and fumoedit
+    fumoedit.site_path = settings["site_path"]
+    fumoedit.tag_priority = settings["tag_priority"].copy()

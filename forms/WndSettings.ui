@@ -9,9 +9,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>341</height>
+    <width>405</width>
+    <height>524</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Settings - FumoEdit-QT</string>
@@ -21,7 +27,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="sizeConstraint">
-    <enum>QLayout::SetFixedSize</enum>
+    <enum>QLayout::SetDefaultConstraint</enum>
    </property>
    <item row="4" column="0">
     <widget class="QDialogButtonBox" name="BbMain">
@@ -29,121 +35,258 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
      </property>
     </widget>
    </item>
    <item row="0" column="0">
     <layout class="QFormLayout" name="formLayout_2">
-     <item row="0" column="0">
-      <widget class="QLabel" name="LblWrapBody">
-       <property name="text">
-        <string>Word wrap:</string>
+     <item row="0" column="0" colspan="2">
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="title">
+        <string>Post editor</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="LblWrapBody">
+          <property name="text">
+           <string>Word wrap:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QCheckBox" name="CbWrapPreview">
+            <property name="text">
+             <string>Body field</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="CbWrapBody">
+            <property name="text">
+             <string>Body preview</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="LblBodyFontSize">
+          <property name="text">
+           <string>Body field font size:</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::MarkdownText</enum>
+          </property>
+          <property name="buddy">
+           <cstring>SbBodyFontSize</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="SbBodyFontSize">
+          <property name="suffix">
+           <string>pt</string>
+          </property>
+          <property name="minimum">
+           <number>7</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="LblPreviewFontSize">
+          <property name="text">
+           <string>Body preview font size:</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::MarkdownText</enum>
+          </property>
+          <property name="buddy">
+           <cstring>SbPreviewFontSize</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="SbPreviewFontSize">
+          <property name="suffix">
+           <string>pt</string>
+          </property>
+          <property name="minimum">
+           <number>7</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
-     <item row="0" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QCheckBox" name="CbWrapPreview">
-         <property name="text">
-          <string>Body field</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="CbWrapBody">
-         <property name="text">
-          <string>Body preview</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+     <item row="2" column="0" colspan="2">
+      <widget class="QGroupBox" name="groupBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>Tag priority</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
+        <item row="0" column="1">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="sizeConstraint">
+           <enum>QLayout::SetDefaultConstraint</enum>
+          </property>
+          <item>
+           <widget class="QPushButton" name="PbTagAdd">
+            <property name="text">
+             <string>Add</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="PbTagDelete">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Delete</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="PbTagUp">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Move Up</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="PbTagDown">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Move Down</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="0" column="0" rowspan="3">
+         <widget class="QTableWidget" name="TwTagPriority">
+          <property name="minimumSize">
+           <size>
+            <width>277</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="tabKeyNavigation">
+           <bool>false</bool>
+          </property>
+          <property name="showDropIndicator" stdset="0">
+           <bool>false</bool>
+          </property>
+          <property name="defaultDropAction">
+           <enum>Qt::IgnoreAction</enum>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="showGrid">
+           <bool>true</bool>
+          </property>
+          <property name="cornerButtonEnabled">
+           <bool>false</bool>
+          </property>
+          <attribute name="horizontalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="horizontalHeaderHighlightSections">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
+          <column>
+           <property name="text">
+            <string>Tag</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="LblBodyFontSize">
-       <property name="text">
-        <string>Body field font size:</string>
+      <widget class="QGroupBox" name="groupBox_3">
+       <property name="title">
+        <string>Repository path</string>
        </property>
-       <property name="textFormat">
-        <enum>Qt::MarkdownText</enum>
-       </property>
-       <property name="buddy">
-        <cstring>SbBodyFontSize</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QSpinBox" name="SbBodyFontSize">
-       <property name="suffix">
-        <string>pt</string>
-       </property>
-       <property name="minimum">
-        <number>7</number>
-       </property>
-       <property name="maximum">
-        <number>100</number>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="LblPreviewFontSize">
-       <property name="text">
-        <string>Body preview font size:</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::MarkdownText</enum>
-       </property>
-       <property name="buddy">
-        <cstring>SbPreviewFontSize</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QSpinBox" name="SbPreviewFontSize">
-       <property name="suffix">
-        <string>pt</string>
-       </property>
-       <property name="minimum">
-        <number>7</number>
-       </property>
-       <property name="maximum">
-        <number>100</number>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="LblSitePath">
-       <property name="text">
-        <string>Path to FumoNet repository:</string>
-       </property>
-       <property name="buddy">
-        <cstring>LeSitePath</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="FilenameEdit" name="LeSitePath"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="PbBrowseSitePath">
-         <property name="text">
-          <string>Browse...</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="4" column="0" colspan="2">
-      <widget class="QLabel" name="LblSitePathDescription">
-       <property name="text">
-        <string>This is used to preview post thumbnails and verify the existence of the filenames that are typed into certain fields.</string>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
+       <layout class="QFormLayout" name="formLayout_3">
+        <item row="0" column="0">
+         <widget class="QLabel" name="LblSitePath">
+          <property name="text">
+           <string>Path to FumoNet repository:</string>
+          </property>
+          <property name="buddy">
+           <cstring>LeSitePath</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="FilenameEdit" name="LeSitePath"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="PbBrowseSitePath">
+            <property name="text">
+             <string>Browse...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="LblSitePathDescription">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>This is used to preview post thumbnails and verify the existence of the filenames that are typed into certain fields.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>
@@ -164,6 +307,11 @@
   <tabstop>SbPreviewFontSize</tabstop>
   <tabstop>LeSitePath</tabstop>
   <tabstop>PbBrowseSitePath</tabstop>
+  <tabstop>TwTagPriority</tabstop>
+  <tabstop>PbTagAdd</tabstop>
+  <tabstop>PbTagDelete</tabstop>
+  <tabstop>PbTagUp</tabstop>
+  <tabstop>PbTagDown</tabstop>
  </tabstops>
  <resources/>
  <connections>

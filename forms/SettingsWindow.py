@@ -108,15 +108,14 @@ class SettingsWindow(QtWidgets.QDialog):
         
         sel = self.get_selected_tagindex()
         
-        if sel != None:
-            sel += 1  # insert below the selected row 
-            self.tag_priority.insert(sel, f"Tag {sel}")
-        else:
-            self.tag_priority.append(f"Tag {len(self.tag_priority)}")
+        if sel == None:
+            sel = 0 # if no row is selected, insert at the top
 
+        sel += 1
+        self.tag_priority.insert(sel, f"New tag")
         self.update_tagpriority_list(False)
 
-        to_select = self.TwTagPriority.item(sel, 0)
+        to_select = self.TwTagPriority.item(sel , 0)
         self.TwTagPriority.setCurrentItem(to_select, QtCore.QItemSelectionModel.SelectCurrent)
 
     def tagpriority_delete(self):

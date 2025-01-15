@@ -284,10 +284,10 @@ class PostWindow(QtWidgets.QMainWindow):
             self.save_post_internal(folderpath)
 
     # Post methods
-    def new_post(self):
-        # Load a blank post in the Blog collection
+    def new_post(self, collection="posts"):
+        # Load a blank post in the given collection
         if self.discard_confirmation():
-            self.load_post(fumoedit.Post(fumoedit.COLLECTIONS["posts"]))
+            self.load_post(fumoedit.Post(fumoedit.COLLECTIONS[collection]))
 
     def load_post(self, post, filepath=None):
         # Brings focus to the Body tab and fills in every field
@@ -300,7 +300,7 @@ class PostWindow(QtWidgets.QMainWindow):
         self.LeID.setText(self.current_post.id)
         self.DeDate.setDate(self.current_post.date)
         self.update_internal_name()
-        self.set_post_collection(self.current_post.collection.label)     
+        self.CbCollection.setCurrentText(self.current_post.collection.label)  
         self.LeTitle.setText(self.current_post.title)
         self.LeThumbName.setText(self.current_post.priority_thumbnail)
         self.PteBody.setPlainText(self.current_post.body)

@@ -256,6 +256,15 @@ class MainWindow(QtWidgets.QMainWindow):
         return post
 
     def new_post(self):
+        collection = ""
+
+        match self.TwCollections.currentIndex():
+            case 0:  # Blog
+                collection = "posts"
+            case 1:  # Artwork
+                collection = "artwork"
+
+        self.editor.new_post(collection)
         self.editor.show()
         self.editor.raise_()
 

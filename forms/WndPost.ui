@@ -24,110 +24,10 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="3">
-     <widget class="QLabel" name="LblID">
-      <property name="text">
-       <string>ID:</string>
-      </property>
-      <property name="buddy">
-       <cstring>LeID</cstring>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="6">
-     <widget class="QLabel" name="LblInternalName">
-      <property name="text">
-       <string>Internal name:</string>
-      </property>
-      <property name="buddy">
-       <cstring>LeInternalName</cstring>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLineEdit" name="LeTags"/>
-    </item>
-    <item row="1" column="4">
-     <widget class="QComboBox" name="CbCollection">
-      <property name="currentText">
-       <string>Blog</string>
-      </property>
-      <item>
-       <property name="text">
-        <string>Blog</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Artwork</string>
-       </property>
-      </item>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="LblTitle">
-      <property name="text">
-       <string>Title:</string>
-      </property>
-      <property name="buddy">
-       <cstring>LeTitle</cstring>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="7">
-     <widget class="QLineEdit" name="LeInternalName">
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="7">
-     <widget class="FilenameEdit" name="LeThumbName"/>
-    </item>
     <item row="2" column="0">
      <widget class="QLabel" name="LblTags">
       <property name="text">
        <string>Tags:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="5">
-     <widget class="Line" name="line">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="3">
-     <widget class="QLabel" name="LblCollection">
-      <property name="text">
-       <string>Collection:</string>
-      </property>
-      <property name="buddy">
-       <cstring>CbCollection</cstring>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="LblDate">
-      <property name="text">
-       <string>Date:</string>
-      </property>
-      <property name="buddy">
-       <cstring>DeDate</cstring>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="4">
-     <widget class="QLineEdit" name="LeID"/>
-    </item>
-    <item row="1" column="6">
-     <widget class="QLabel" name="LblThumbName">
-      <property name="text">
-       <string>Thumbnail filename:</string>
-      </property>
-      <property name="buddy">
-       <cstring>LeThumbName</cstring>
       </property>
      </widget>
     </item>
@@ -290,28 +190,119 @@
       </widget>
      </widget>
     </item>
-    <item row="2" column="2">
-     <widget class="QPushButton" name="PbKnownTags">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
+    <item row="1" column="0">
+     <widget class="QLabel" name="LblTitle">
       <property name="text">
-       <string>Known tags...</string>
+       <string>Title:</string>
+      </property>
+      <property name="buddy">
+       <cstring>LeTitle</cstring>
       </property>
      </widget>
     </item>
-    <item row="1" column="1" colspan="2">
+    <item row="0" column="0">
+     <widget class="QLabel" name="LblDate">
+      <property name="text">
+       <string>Date:</string>
+      </property>
+      <property name="buddy">
+       <cstring>DeDate</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="TagsEdit" name="LeTags">
+      <property name="toolTip">
+       <string>Press Enter while typing a tag to auto-complete it.</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
      <widget class="QLineEdit" name="LeTitle"/>
     </item>
-    <item row="0" column="1" colspan="2">
+    <item row="0" column="1">
      <widget class="QDateEdit" name="DeDate">
       <property name="displayFormat">
        <string>dd/MM/yyyy</string>
       </property>
      </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QLabel" name="LblCollection">
+      <property name="text">
+       <string>Collection:</string>
+      </property>
+      <property name="buddy">
+       <cstring>CbCollection</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QLabel" name="LblID">
+      <property name="text">
+       <string>ID:</string>
+      </property>
+      <property name="buddy">
+       <cstring>LeID</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QLineEdit" name="LeID"/>
+    </item>
+    <item row="1" column="3">
+     <widget class="QComboBox" name="CbCollection">
+      <property name="currentText">
+       <string>Blog</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>Blog</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Artwork</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="5">
+     <widget class="QLabel" name="LblInternalName">
+      <property name="text">
+       <string>Internal name:</string>
+      </property>
+      <property name="buddy">
+       <cstring>LeInternalName</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="5">
+     <widget class="QLabel" name="LblThumbName">
+      <property name="text">
+       <string>Thumbnail filename:</string>
+      </property>
+      <property name="buddy">
+       <cstring>LeThumbName</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="6">
+     <widget class="QLineEdit" name="LeInternalName">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="6">
+     <widget class="FilenameEdit" name="LeThumbName"/>
     </item>
    </layout>
   </widget>
@@ -419,16 +410,20 @@
    <extends>QLineEdit</extends>
    <header>widgets.FilenameEdit</header>
   </customwidget>
+  <customwidget>
+   <class>TagsEdit</class>
+   <extends>QLineEdit</extends>
+   <header>widgets.TagsEdit</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>DeDate</tabstop>
-  <tabstop>LeID</tabstop>
-  <tabstop>LeInternalName</tabstop>
   <tabstop>LeTitle</tabstop>
-  <tabstop>CbCollection</tabstop>
-  <tabstop>LeThumbName</tabstop>
   <tabstop>LeTags</tabstop>
-  <tabstop>PbKnownTags</tabstop>
+  <tabstop>LeID</tabstop>
+  <tabstop>CbCollection</tabstop>
+  <tabstop>LeInternalName</tabstop>
+  <tabstop>LeThumbName</tabstop>
   <tabstop>TwEditors</tabstop>
   <tabstop>PteBody</tabstop>
   <tabstop>TeBodyPreview</tabstop>

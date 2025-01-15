@@ -110,7 +110,7 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QLineEdit" name="LeTags"/>
+        <widget class="TagsEdit" name="LeTags"/>
        </item>
        <item row="2" column="0" colspan="4">
         <widget class="QPushButton" name="PbSelectionClear">
@@ -602,6 +602,11 @@
    <class>ThumbnailPreview</class>
    <extends>QGraphicsView</extends>
    <header>widgets.ThumbnailPreview</header>
+  </customwidget>
+  <customwidget>
+   <class>TagsEdit</class>
+   <extends>QLineEdit</extends>
+   <header>widgets.TagsEdit</header>
   </customwidget>
  </customwidgets>
  <tabstops>

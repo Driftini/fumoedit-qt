@@ -288,7 +288,6 @@ class PostWindow(QtWidgets.QMainWindow):
         # Load a blank post in the Blog collection
         if self.discard_confirmation():
             self.load_post(fumoedit.Post(fumoedit.COLLECTIONS["posts"]))
-            print(f"* Created new post at {currenttime()}")
 
     def load_post(self, post, filepath=None):
         # Brings focus to the Body tab and fills in every field

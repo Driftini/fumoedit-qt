@@ -109,8 +109,11 @@ class MainWindow(QtWidgets.QMainWindow):
             self.LblArtInfoDate.setText(date_str)
             self.LblArtInfoTags.setText(post.get_tags())
 
-            path, offset = post.get_thumbnail_ospath_withoffset()
-            self.GvArtSelectionPreview.update_preview(path, offset)
+            if post.has_thumbnail():
+                path, offset = post.get_thumbnail_ospath_withoffset()
+                self.GvArtSelectionPreview.update_preview(path, offset)
+            else:
+                self.GvArtSelectionPreview.update_preview()
 
             # Toggles art post selection when shift-clicking
             if QtWidgets.QApplication.keyboardModifiers() == Qt.ShiftModifier:

@@ -17,6 +17,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.editor = PostWindow(self)
         self.connect_signals()
 
+        # Set better column widths for the tables
+        table_headers = [
+            self.TwBlogPosts.horizontalHeader(),
+            self.TwArtPosts.horizontalHeader(),
+            self.TwSelection.horizontalHeader()
+        ]
+
+        for h in table_headers:
+            h.resizeSection(0, 120)
+
         self.selection = []
 
         self.reload_collections(False)

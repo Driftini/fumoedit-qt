@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from forms.MainWindow import MainWindow
 from settings import *
 import sys

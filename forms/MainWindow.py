@@ -187,28 +187,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # Continue automatically if the filepath doesn't exist
         return True
 
-    def collection_mismatch_confirmation(self, collection):
-        # If there's a mismatch between the current post's collection
-        # and the folder it's being saved into, ask for
-        # confirmation before continuing
-        if (
-            self.current_post.get_collection() != collection
-            or self.current_picture.get_collection() != "_" + collection
-        ):
-            msgbox = QtWidgets.QMessageBox()
-            msgbox.setIcon(QtWidgets.QMessageBox.Warning)
-
-            reply = msgbox.question(
-                self, "Collection mismatch",
-                f"The selected folder doesn't match this post's collection.\nDo you want to save this post while discarding its current collection?",
-                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel,
-                QtWidgets.QMessageBox.Cancel
-            )
-
-            return reply == QtWidgets.QMessageBox.StandardButton.Yes
-        # Continue automatically if there's no collection mismatch
-        return True
-
     def internal_name_mismatch_confirmation(self):
         # If there's a mismatch between the current post's collection
         # and the folder it's being saved into, ask for
@@ -221,7 +199,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 msgbox = QtWidgets.QMessageBox()
                 msgbox.setIcon(QtWidgets.QMessageBox.Warning)
 
-
                 reply = msgbox.question(
                     self, "Internal name mismatch",
                     f"This post's internal name has been changed from \"{last_i_n}\" to \"{i_n}\".\nSave with the new internal name?",
@@ -229,9 +206,33 @@ class MainWindow(QtWidgets.QMainWindow):
                     QtWidgets.QMessageBox.Cancel
                 )
 
-                return reply == QtWidgets.QMessageBox.StandardButton.Yes
+                return reply == QtWidgets.QMessageBox.StandardButton.Yes                
         # Continue automatically if there's no internal name mismatch
         # or if the post is being saved for the first time
+        return True
+        
+    def empty_link_confirmation(self):
+        # If the post body contains hyperlinks without a path,
+        # show a warning before continuing
+        emptylink_pos = self.PtePostBody.toPlainText().find("]()")
+        
+        if emptylink_pos >= 0:
+            msgbox = QtWidgets.QMessageBox()
+            msgbox.setIcon(QtWidgets.QMessageBox.Warning)
+
+            reply = msgbox.question(
+                self, "Empty hyperlinks found",
+                f"This post contains one or more empty hyperlinks.\nSave the post anyway?",
+                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel,
+                QtWidgets.QMessageBox.Cancel
+            )
+            
+            if reply != QtWidgets.QMessageBox.StandardButton.Yes:
+                # If canceling, bring focus to the post body's field
+                self.PtePostBody.setFocus(Qt.FocusReason.OtherFocusReason)
+
+            return reply == QtWidgets.QMessageBox.StandardButton.Yes
+        # Continue automatically if there are no empty hyperlinks
         return True
 
     def show_settings(self):
@@ -368,18 +369,15 @@ class MainWindow(QtWidgets.QMainWindow):
         # Set post properties to the GUI's fields' values,
         # NOT to be called directly
 
+        checks_successful = self.empty_link_confirmation()
+
         if self.current_filepath:
-            # If the current post has been saved before,
-            # perform internal name and collection mismatch checks...
+            # If the current post has already been saved once,
+            # perform an additional internal name check
             checks_successful = (
-                self.internal_name_mismatch_confirmation()
-                and self.collection_mismatch_confirmation(
-                    path.dirname(self.current_filepath)
-                )
+                checks_successful
+                and self.internal_name_mismatch_confirmation()
             )
-        else:
-            # ...otherwise, don't perform any checks and save right away
-            checks_successful = True
 
         if checks_successful:
             self.current_post.id = self.LePostID.text()
